@@ -1,0 +1,16 @@
+baseURL = 'https://opencamp-blogsite.com/'
+title = "nostalgia"
+languageCode = 'en-us'
+theme = 'PaperMod'
+
+[params]
+description = "Nostalgia"
+author = ["nostalgia"]
+
+[params.profileMode]
+enabled = true
+title = "nostalgia"
+
+[[params.profileMode.buttons]]
+name = "Posts"
+url = "posts"
