@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📃 Report Issue 
+    url: https://github.com/lvyuemeng/opencamp-blog/issues/new
+    description: Report a bug or request a feature
+  - name: 👀 Github Discussions
+    url: https://github.com/lvyuemeng/opencamp-blog/discussions
+    description: Ask a question or start a discussion
