@@ -17,6 +17,10 @@
     <loc>http://localhost:1313/tags/</loc>
     <lastmod>2025-03-19T19:50:44+08:00</lastmod>
   </url><url>
+    <loc>http://localhost:1313/archives/</loc>
+  </url><url>
     <loc>http://localhost:1313/categories/</loc>
+  </url><url>
+    <loc>http://localhost:1313/search/</loc>
   </url>
 </urlset>
