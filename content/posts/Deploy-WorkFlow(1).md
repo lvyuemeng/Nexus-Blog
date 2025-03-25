@@ -101,6 +101,32 @@ You can use others or given actions to ease your burden, for example:
         uses: actions/deploy-pages@v4
 ```
 
+##### Deploy
+
+Following `hugo` tutorial, you can deploy on `gihub`
+
+1. Go to the repo `Settings` and find `Pages`
+2. Switch the `Build and deployment`'s `Source` to `GitHub Actions`
+
+> [Deploy Action](.github/workflows/hugo-deploy.yml)
+
+1. Install hugo CLI
+2. Get PR Code
+3. Build Code
+4. Upload Site 
+5. Deploy Site
+
+##### Pull Request Validation
+
+The logic is same.
+
+> [Pr Validate Action](.github/workflows/pr-validate.yml)
+
+1. Install hugo CLI
+2. Get PR Code
+3. Build Code
+4. Check `./public` consistency
+
 ### Beautify
 
 The ways to beautify your blog is based on your theme. Here [`PaperMod`](https://github.com/adityatelange/hugo-PaperMod/wiki/Features) provide various configurations, we list a part of it for our own:
