@@ -1,23 +1,23 @@
 +++
 date = '2025-03-24T22:27:11+08:00'
-draft = true
+draft = false
 title = 'Deploy WorkFlow(1)'
 tag = ["Deploy"]
 author = ["nostalgia"]
 +++
 
-## Deploy of Blog
+# Deploy of Blog
 
 Here a record of deployment of static blog by `hugo`
 
-### Preparation
+## Preparation
 
 Toolchain:
 
 - hugo
 - git
 
-### Create Site
+## Create Site
 
 ```bash
 hugo new site <your-name>
@@ -33,9 +33,9 @@ Setting the theme to "PaperMod"
 theme = "PaperMod"
 ```
 
-### Workflow Configuration
+## Workflow Configuration
 
-#### Git Ignore
+### Git Ignore
 
 Setting .gitignore to remove auto-generated content
 ```
@@ -44,7 +44,7 @@ public/
 resources/
 ```
 
-#### Issue Template
+### Issue Template
 
 A readable template can help you classify issues, make it more understandable.
 
@@ -68,7 +68,7 @@ contact_links:
     description: Ask a question or start a discussion
 ```
 
-#### Action
+### Action
 
 A automated action can be used for deployment, test coverage in pr, etc. Currently, we set the 'deploy' and 'pr-validate' for such two cases.
 
@@ -101,7 +101,7 @@ You can use others or given actions to ease your burden, for example:
         uses: actions/deploy-pages@v4
 ```
 
-##### Deploy
+#### Deploy
 
 Following `hugo` tutorial, you can deploy on `gihub`
 
@@ -116,7 +116,7 @@ Following `hugo` tutorial, you can deploy on `gihub`
 4. Upload Site 
 5. Deploy Site
 
-##### Pull Request Validation
+#### Pull Request Validation
 
 The logic is same.
 
@@ -127,7 +127,7 @@ The logic is same.
 3. Build Code
 4. Check `./public` consistency
 
-### Beautify
+## Beautify
 
 The ways to beautify your blog is based on your theme. Here [`PaperMod`](https://github.com/adityatelange/hugo-PaperMod/wiki/Features) provide various configurations, we list a part of it for our own:
 

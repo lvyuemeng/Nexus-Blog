@@ -1,14 +1,14 @@
 +++
 date = '2025-03-24T22:53:47+08:00'
-draft = true
+draft = false
 title = 'Deploy WorkFlow(2)'
 tag = ["Deploy"]
 author = ["nostalgia"]
 +++
 
-### Collaboration
+## Collaboration
 
-#### Rules
+### Rules
 
 You could set rules for collaboration and preventing safety issues.
 
@@ -23,7 +23,7 @@ Usually, you want prevent someone modify `main` branch arbitrarily and restrict 
 	
 Here are some simple block rules you want to set.
 
-#### Pull Request
+### Pull Request
 
 You should create a new branch to circumvent awkward situation for your modification, you can create a new pull request to do this in ease.
 
@@ -41,7 +41,7 @@ git push origin <branch-name>
 
 Then create `New Pull Request` in the github repo, github will detect your remote push branch and suggest the pr format.
 
-#### Code Review
+### Code Review
 
 Usually, a branch may contains many modification and diverge, you may want to keep it neat and readable. So, we can do the following:
 
@@ -64,6 +64,6 @@ Here are verbs you should know:
 
 The Above reference of **commit** include its content and message, so if you `drop` commit, it will remove all code it modifies and message!
 
-#### Summary
+## Summary
 
 Here are all you want to do for a simple static blog deployment, including a bit of knowledges about git. You can refer [Git Book](https://git-scm.com/book/en/v2) if you want! Thanks for your reading!

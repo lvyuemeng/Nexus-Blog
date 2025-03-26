@@ -1,15 +1,14 @@
-baseURL = 'https://opencamp-blogsite.com/'
-title = "nostalgia"
+baseURL = 'https://nexus.com/'
 languageCode = 'en-us'
 theme = 'PaperMod'
 
 [params]
-description = "Nostalgia"
-author = ["nostalgia"]
+description = "A static blog platform for everyone!"
+author = ["nostalgia", "creatoy"]
 
 [params.profileMode]
 enabled = true
-title = "nostalgia"
+title = "Nexus"
 showShareButtons = true
 showReadingTime = true
 showCodeCopyButtons = true
