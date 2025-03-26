@@ -1,16 +1,51 @@
-baseURL = 'https://opencamp-blogsite.com/'
-title = "nostalgia"
+baseURL = "https://lvyuemeng.github.io/Nexus-Blog/"
+title = "Nexus"
 languageCode = 'en-us'
 theme = 'PaperMod'
 
 [params]
-description = "Nostalgia"
-author = ["nostalgia"]
+description = "A static blog platform for everyone!"
+author = ["nostalgia", "creatoy"]
 
 [params.profileMode]
 enabled = true
-title = "nostalgia"
+title = "Nexus"
+showShareButtons = true
+showReadingTime = true
+showCodeCopyButtons = true
+showToC = true
+showBreadCrumbs = true
 
+# Profile Links
 [[params.profileMode.buttons]]
 name = "Posts"
 url = "posts"
+
+[[params.profileMode.buttons]]
+name = "Tags"
+url = "tags"
+
+[[params.profileMode.buttons]]
+name = "Archives"
+url = "archives"
+
+[[params.profileMode.buttons]]
+name = "Search"
+url = "search"
+
+[[params.socialIcons]]
+name = "Github"
+url = "https://github.com/lvyuemeng/opencamp-blog"
+
+# Search Settings
+[params.fuseOpts]
+isCaseSensitive = false
+shouldSort = true
+location = 0
+distance = 1_000
+threshold = 0.4
+minMatchCharLength = 0
+keys = ["title", "permalink", "summary", "content"]
+
+[outputs]
+home = ["HTML", "RSS", "JSON"]
