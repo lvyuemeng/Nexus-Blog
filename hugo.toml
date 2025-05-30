@@ -35,7 +35,7 @@ url = "search"
 
 [[params.socialIcons]]
 name = "Github"
-url = "https://github.com/lvyuemeng/opencamp-blog"
+url = "https://github.com/lvyuemeng/Nexus-blog"
 
 # Search Settings
 [params.fuseOpts]
