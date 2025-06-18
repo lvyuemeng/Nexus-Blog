@@ -6,8 +6,6 @@ tag = ["embed", "arceos", "embassy"]
 author = ["nostalgia"]
 +++
 
-# AxEmbassy-Development
-
 ## Design and Background
 
 AxEmbassy module is the incorporation of Embassy and Arceos. Mainly for aiding Arceos by async runtime of Embassy.
