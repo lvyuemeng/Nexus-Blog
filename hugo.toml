@@ -1,7 +1,8 @@
 baseURL = "https://lvyuemeng.github.io/Nexus-Blog/"
 title = "Nexus"
 languageCode = 'en-us'
-theme = 'PaperMod'
+theme = ["hugo-embed-pdf-shortcode",'PaperMod']
+enableInlineShortcodes = true
 
 [params]
 description = "A static blog platform for everyone!"
