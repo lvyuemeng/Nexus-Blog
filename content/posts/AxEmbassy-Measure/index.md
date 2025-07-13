@@ -68,21 +68,21 @@ macro_rules! work_loop {
 
 We fix `busy_work` iterations as `1e^3` to acquire `delay` as below:
 
-![](/Nexus-Blog/charts/iter-volume.png)
+![](iter-volume.png)
 
 Here the blue(high) and green(low) is **async task**, while orange is **thread task**. We see a increasing trend of async task much higher than thread, comes from the burden of poll in linear data structure of embassy executor for the sole thread, while thread is preemptive to interrupt in time slice, introduce a nearly constant time here.
 
-![](/Nexus-Blog/charts/iter-works.png)
+![](iter-works.png)
 
 Here the blue and orange is **async task**, while orange is **thread task**. With logarithm horizontal and vertical axis, we see both a linear and roughly close linear growth.
 
 We try to test higher iterations on it and shows below:
 
-![](/Nexus-Blog/charts/iter-works-extend.png)
+![](iter-works-extend.png)
 
 That's we extend the test time to 300 seconds to acquire a full data on rather lengthy iterations. We can see a rather higher increase on thread task, rather, async task maintains linear growth.
 
-![](/Nexus-Blog/charts/counts-volume.png)
+![](counts-volume.png)
 
 We see a linear growth both for thread task and async task with fixed `busy_works` iterations and increase of volume. We see that even the delay of async task is much higher than thread, its iteration counts aren't curbed.
 
