@@ -12,7 +12,7 @@ author = ["nostalgia"]
 
 **[Week 1]**
 
-[uring][uring ref]
+- [uring][uring ref]
 
 - SQ: Submission queue based on circular queue
 - CQ: Completion queue based on circular queue
@@ -36,10 +36,11 @@ Completion:
 
 ## What is a lock free ring buffer?
 
-[ring][ring ref]
+- [ring][ring ref]
 
 **[Week 2]**
-[concurrent queue][concurrent queue ref]
+
+- [concurrent queue][concurrent queue ref]
 
 ![](ring.png)
 
@@ -251,18 +252,14 @@ enum Lifecycle {
 
 [Tokio Uring ref]: https://github.com/tokio-rs/tokio-uring/blob/7761222aa7f4bd48c559ca82e9535d47aac96d53/DESIGN.md
 
-## Monoio
-
-> **Waited to be implemented**
-
 ---
 
 ## Evering
 
 **[Week 2]**
 
-[Evering ref][Evering ref]
-[Mine ref][Mine Evering ref]
+- [Evering ref][Evering ref]
+- [Mine ref][Mine Evering ref]
 
 ### Uring
 
@@ -370,3 +367,45 @@ We use a `AtomicBool` to indicate the discard signal when future `drop(fut)`. Th
 [Evering ref]: https://github.com/loichyan/openoscamp-2025s/tree/main/evering
 
 [Mine Evering ref]: https://github.com/lvyuemeng/Evering (I will use a refactor version based on my understanding.)
+
+---
+
+## Shared Memory
+
+**[Week 5]**
+
+- [Shm][Shm ref]
+
+```rust
+pub struct ShmBox<T: ?Sized>(NonNull<T>);
+```
+
+`ShmBox` is a `Box<T>`-like structure with life time handled by shared memory related allocator.
+
+Given a allocator, allocate a continuous memory range:
+
+```
+/// [`ShmHeader`] contains necessary metadata of a shared memory region.
+///
+/// Memory layout of the entire shared memory is illustrated as below,
+///
+/// ```svgbob
+/// .-----------------------------------------------------------------------------.
+/// |                   |               |                   |                     |
+/// | [1] uring offsets | [2] allocator | [3] uring buffers | [4] free memory ... |
+/// | ^                 |               |                   |                   ^ |
+/// '-|-------------------------------------------------------------------------|-'
+///   '-- start of the shared memory (page aligned)                             |
+///                                                  end of the shared memory --'
+/// ```
+```
+
+The design is raw, given a finite range, the allocator must ensure that it allocates everything inside the range for file mapping. Then we should handle everything with `NonNull<T>` explicitly. We also need a static life time file descriptor to maintain a consistency.
+
+Thus a independent allocator with concrete memory layout could be used as a isolated shared memory constructor as `ShmBox<T,A>`. A box can be coupled with inter-process atomic `Mutex` for reading/writing, or better, a signal design if possible with uring.
+
+A general design should use a `A:Allocator`, however, rust tends to use global allocator and the related api is experimental. Rather, if we want to develop a independent part of memory management, we should use `NonNull<T>` as mentioned before, it's unbearable considering the maintaining period.
+
+As for the layout, it would cast to the allocator itself with its best on memory continuity, thus, `allocator + uring + free memory` as a unified instance solely with stable exposed api.
+
+[Shm ref]: https://github.com/loichyan/openoscamp-2025s/blob/main/examples/evering-ipc/src/shm/boxed.rs
