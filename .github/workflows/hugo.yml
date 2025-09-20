@@ -1,0 +1,141 @@
+# Sample workflow for building and deploying a Hugo site to GitHub Pages
+name: Deploy Hugo site to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# Default to bash
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # fixed version
+      # DART_SASS_VERSION: 1.92.1
+      # GO_VERSION: 1.25.1
+      # HUGO_VERSION: 0.150.0
+      # NODE_VERSION: 22.18.0
+      TZ: Europe/Oslo
+    steps:
+      # checkout repo
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          
+      # setup Go, Node.js
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "stable"
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "lts/*"      
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Prepare Directories
+        run: |
+          mkdir -p "${HOME}/.local/{hugo,dart-sass}"
+
+      # setup Dart/Hugo
+      - name: Setup Dart
+        run: |
+          LATEST_SASS=$(curl -s https://api.github.com/repos/sass/dart-sass/releases/latest | jq -r .tag_name)
+          echo "Installing Dart Sass ${LATEST_SASS}"
+          INSTALL_DIR="${HOME}/.local/dart-sass"
+          mkdir -p "$INSTALL_DIR"
+          curl -sL "https://github.com/sass/dart-sass/releases/download/${LATEST_SASS}/dart-sass-${LATEST_SASS}-linux-x64.tar.gz" \
+            | tar -xz -C "$INSTALL_DIR" --strip-components=1
+          echo "$INSTALL_DIR" >> "$GITHUB_PATH"
+      - name: Setup Hugo
+        run: |
+          LATEST_HUGO=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "Installing Hugo ${LATEST_HUGO}"
+          INSTALL_DIR="${HOME}/.local/hugo"
+          mkdir -p "$INSTALL_DIR"
+          curl -sL "https://github.com/gohugoio/hugo/releases/download/v${LATEST_HUGO}/hugo_extended_${LATEST_HUGO}_linux-amd64.tar.gz" \
+            | tar -xz -C "$INSTALL_DIR"
+          echo "$INSTALL_DIR" >> "${GITHUB_PATH}"
+
+      - name: Verify Toolchain
+        run: |
+          echo "Dart Sass: $(sass --version)"
+          echo "Go: $(go version)"
+          echo "Hugo: $(hugo version)"
+          echo "Node.js: $(node --version)"
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+      - name: Setup Node.js Dependencies
+        run: |
+          [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || echo "No lockfile found, skipping npm install."
+
+      - name: Configure Git
+        run: git config core.quotepath false
+
+      - name: Restore Hugo Cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/hugo_cache
+          key: hugo-${{ hashFiles('**/*.md', 'hugo.toml', 'config.toml', 'package-lock.json') }}
+          restore-keys: hugo-
+
+      - name: Build the site
+        run: |
+          hugo \
+            --gc \
+            --minify \
+            --baseURL "${{ steps.pages.outputs.base_url }}/" \
+            --cacheDir "${{ runner.temp }}/hugo_cache"
+
+      - name: Save Hugo Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/hugo_cache
+          key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

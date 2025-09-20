@@ -1,12 +1,9 @@
-# Sample workflow for building and deploying a Hugo site to GitHub Pages
 name: PR Validation
 
 on:
-  # Runs on pushes targeting the default branch
   pull_request:
     branches: ["main"]
 
-# Default to bash
 defaults:
   run:
     shell: bash
@@ -15,45 +12,46 @@ jobs:
   validate-build:
     runs-on: ubuntu-latest
     steps:
-      # --------------------------
-      # 1. Install Hugo
-      # --------------------------
-      - name: Install Hugo
-        run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v0.128.0/hugo_extended_0.128.0_linux-amd64.deb
-          sudo dpkg -i ${{ runner.temp }}/hugo.deb
-
-      # --------------------------
-      # 2. Get PR Code
-      # --------------------------
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          submodules: recursive  # Important for Hugo themes
-          ref: ${{ github.event.pull_request.head.sha }}  # Checkout PR commit
+          submodules: recursive
+          ref: ${{ github.event.pull_request.head.sha }}
 
-      # --------------------------
-      # 3. Build Site
-      # --------------------------
+      - name: Setup Hugo
+        run: |
+          LATEST_HUGO=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "Installing Hugo ${LATEST_HUGO}"
+          INSTALL_DIR="${HOME}/.local/hugo"
+          mkdir -p "$INSTALL_DIR"
+          curl -sL "https://github.com/gohugoio/hugo/releases/download/v${LATEST_HUGO}/hugo_extended_${LATEST_HUGO}_linux-amd64.tar.gz" \
+          | tar -xz -C "$INSTALL_DIR"
+          echo "$INSTALL_DIR" >> "${GITHUB_PATH}"
+
+
+      - name: Restore Hugo Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/hugo_cache
+          key: hugo-${{ hashFiles('**/*.md', 'hugo.toml', 'config.toml') }}
+          restore-keys: hugo-
+
       - name: Build with Hugo
         run: |
-          hugo --minify --buildDrafts --buildFuture
-          # --minify: Test production build
-          # --buildDrafts: Check draft posts
-          # --buildFuture: Verify scheduled posts
+          hugo \
+            --gc \
+            --minify \
+            --buildDrafts \
+            --buildFuture \
+            --cacheDir "${{ runner.temp }}/hugo_cache"
 
-      # --------------------------
-      # 4. Integrity Checks
-      # --------------------------
       - name: Verify Build Output
         run: |
-          # Check public directory exists
           if [ ! -d "./public" ]; then
             echo "❌ Error: No public directory generated"
             exit 1
           fi
 
-          # Check for HTML files
           HTML_COUNT=$(find ./public -name "*.html" | wc -l)
           if [ "$HTML_COUNT" -eq 0 ]; then
             echo "❌ Error: No HTML files generated"
@@ -63,14 +61,16 @@ jobs:
           [ -f "./public/index.html" ] || (echo "❌ Missing index.html" && exit 1)
           [ -f "./public/404.html" ] || echo "⚠️ Warning: 404 page missing"
 
-      # --------------------------
-      # Optional: Link Checker
-      # --------------------------
+      - name: Save Hugo Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/hugo_cache
+          key: hugo-${{ hashFiles('**/*.md', 'hugo.toml', 'config.toml') }}
+
       - name: Check Links (Optional)
-        continue-on-error: true  # Don't block PR for broken links
+        continue-on-error: true
         run: |
-          # Install link checker
-          sudo apt-get install -y lychee
-          
-          # Check internal links only
-          lychee --base ./public ./public/**/*.html
+          sudo apt-get update && sudo apt-get install -y lychee
+          # Run link check, ignore external URLs to avoid flaky failures
+          lychee --base ./public --exclude-mail --offline ./public/**/*.html
