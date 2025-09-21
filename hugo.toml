@@ -4,6 +4,10 @@ languageCode = 'en-us'
 theme = ["hugo-embed-pdf-shortcode", 'PaperMod']
 enableInlineShortcodes = true
 
+[module]
+[[module.imports]]
+path = "github.com/lvyuemeng/Noteloom"
+
 [params]
 description = "A static blog platform for everyone!"
 author = ["nostalgia", "creatoy"]

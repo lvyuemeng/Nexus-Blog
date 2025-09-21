@@ -52,21 +52,36 @@ author: []
 
 However, it's optional to replace the format in `yaml/toml` or your custom template referring Hugo docs!
 
+Then you could make new post by `hugo new -c "./your-dir" "post-name.md"` to create new posts, however, you **can't** create posts in **root-dir** because it will resolve the parent dir of your repo for archetypes template!
+
 - In **Nexus** repo, insert your repo like this:
 
 ```toml
 [module]
-...
-
 [[module.imports]]
+...
 path = "github.com/yourusername/your notes repo"
-mount = [
-  { source = "posts", target = "content/posts/notes" },
-  { source = "assets/images", target = "static/notes/images" }
-]
 ```
 
-Where it place your `posts/` in `content/posts/notes` and `assets/images` in `static/notes/images`. It's up to you to create your own path resolution.
+- In **Your Notes** repo, insert your mounts path like this:
+
+```toml
+[[module.mounts]]
+source = "posts/"
+target = "content/posts/your-name" # <your-name> path to avoid confliction!
+
+[[module.mounts]]
+source = "posts/single-post.md"
+target = "content/posts/your-name/single-post.md"
+```
+
+Where it place your `posts/` in `content/posts/your-name`. It's up to you to create your own path resolution.
+
+**Caveat**:
+
+- If multiple person mounts the same path, `hugo` will merge all.
+- If the posts name is **same**, `hugo` will choose the priority one in import order.
+- Thus if you want to avoid confliction, please create a custom name!
 
 ---
 
