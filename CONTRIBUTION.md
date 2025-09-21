@@ -20,10 +20,64 @@ We welcome and appreciate contributions from the community! Whether you want to 
 - Push to your branch: `git push origin your-branch-name`
 - Open a Pull Request (PR) against the `main` branch
 
+---
+
 ### 2. Contributing Articles
+
 - Create a new branch for each article: `git checkout -b new_branch`
-- Following below criterion or `hugo new content <repo-root>/content/posts/<blog-name>` 
-- Any possible variables could be checked on [Variables](https://hugo-docs.netlify.app/en/variables/page/) and [PaperMod-Wiki](https://github.com/adityatelange/hugo-PaperMod/wiki/Features)
+
+---
+
+#### Single Article
+
+- Following below criterion or `hugo new content <repo-root>/content/posts/<blog-name>` which will create header automatically.
+- Any possible variables for template could be checked on [Variables](https://hugo-docs.netlify.app/en/variables/page/) and [PaperMod-Wiki](https://github.com/adityatelange/hugo-PaperMod/wiki/Features)
+
+#### Multiple Articles
+
+This is suitable for a *isolated* repo with hugo initialization.
+
+- You should have a isolated repo contains all your notes, then use `hugo mod init <your remote repo>` to initialize hugo module.
+- (Optional) create a default template for header by placing below code in `/archetypes/default.md`:
+
+```yaml
+---
+title: '{{ replace .File.ContentBaseName "-" " " | title }}'
+date: {{ .Date }}
+draft: true
+tags: []
+author: []
+---
+```
+
+However, it's optional to replace the format in `yaml/toml` or your custom template referring Hugo docs!
+
+- In **Nexus** repo, insert your repo like this:
+
+```toml
+[module]
+...
+
+[[module.imports]]
+path = "github.com/yourusername/your notes repo"
+mount = [
+  { source = "posts", target = "content/posts/notes" },
+  { source = "assets/images", target = "static/notes/images" }
+]
+```
+
+Where it place your `posts/` in `content/posts/notes` and `assets/images` in `static/notes/images`. It's up to you to create your own path resolution.
+
+---
+
+- Check your content by `hugo server -D`(`-D` means draft shown)
+- If success, change `draft = true` to `draft = false`
+- Commit your changes and push to your branch
+- Open a Pull Request (PR) against the `main` branch
+
+---
+
+### Format
 
 - All articles should be written in Markdown (.md)
 - Place files in `content/posts/` directory
@@ -42,7 +96,15 @@ We welcome and appreciate contributions from the community! Whether you want to 
   
   Your article content goes here...
   ```
-- Check your content by `hugo server -D`(`-D` means draft shown)
-- If success, change `draft = true` to `draft = false`
-- Commit your changes and push to your branch
-- Open a Pull Request (PR) against the `main` branch
+
+#### Latex
+
+If you want to render latex, please place below inline or block:
+
+```md
+$$
+x + y = 3 \
+$$
+
+The equation of $x^2 + y^2 = 1$ is ...
+```

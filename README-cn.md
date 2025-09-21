@@ -1,6 +1,6 @@
 **English** | **[简体中文](README-cn.md)** 
 
-# OpenCamp 博客
+# [OpenCamp Blog](https://lvyuemeng.github.io/Nexus-Blog) 
 
 这是一个基于 Hugo 的静态博客部署项目，主要源于OpenCamp-Git。
 
@@ -14,5 +14,6 @@
 
 在 [贡献指南](./CONTRIBUTION.md) 中查看更多信息!
 
-## 版权
+## ⚖️ COPYRIGHT
+
 [Apache 2.0 许可证](./LICENSE) - 版权所有 (C) 2025 由 Nostalgia 和 [贡献者](https://github.com/lvyuemeng/Nexus-Blog/graphs/contributors ) 共同拥有
