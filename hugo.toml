@@ -1,12 +1,14 @@
 baseURL = "https://lvyuemeng.github.io/Nexus-Blog/"
 title = "Nexus"
 languageCode = 'en-us'
-theme = ["hugo-embed-pdf-shortcode",'PaperMod']
+theme = ["hugo-embed-pdf-shortcode", 'PaperMod']
 enableInlineShortcodes = true
 
 [params]
 description = "A static blog platform for everyone!"
 author = ["nostalgia", "creatoy"]
+# enable math render
+math = true
 
 [params.profileMode]
 enabled = true
@@ -21,6 +23,10 @@ showBreadCrumbs = true
 [[params.profileMode.buttons]]
 name = "Posts"
 url = "posts"
+
+[[params.profileMode.buttons]]
+name = "Tag"
+url = "tag"
 
 [[params.profileMode.buttons]]
 name = "Archives"
@@ -47,6 +53,18 @@ keys = ["title", "permalink", "summary", "content"]
 [outputs]
 home = ["HTML", "RSS", "JSON"]
 
+[markup]
+[markup.goldmark]
+[markup.goldmark.extensions]
+[markup.goldmark.extensions.passthrough]
+enable = true
+[markup.goldmark.extensions.passthrough.delimiters]
+block = [['\[', '\]'], ['$$', '$$']]
+inline = [['\(', '\)']]
+
+[taxonomies]
+tag = "tag"
+
 [caches]
-  [caches.images]
-    dir = ':cacheDir/images'
+[caches.images]
+dir = ':cacheDir/images'
