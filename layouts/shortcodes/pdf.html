@@ -1,0 +1,145 @@
+{{ $pdf_url := .Get "src" }}
+{{ $height := or (.Get "height") "80vh" }}
+{{ $id := printf "pdf-%s" (substr ($pdf_url | md5) 0 8) }}
+
+<style>
+    .pdf-card {
+        width: 100%;
+        max-width: 100%;
+        margin: 1em 0;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        background: #1d1e20;
+        color: #e0e0e0;
+        font-family: sans-serif;
+    }
+
+    .pdf-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #2a2b2e;
+        padding: 0.6em 1em;
+        font-size: 0.95em;
+        border-bottom: 1px solid #3a3b3f;
+    }
+
+    .nav-buttons {
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+    }
+
+    .pdf-page-info {
+        opacity: 0.8;
+    }
+
+    .pdf-btn {
+        padding: 0.4em 0.8em;
+        border-radius: 6px;
+        border: none;
+        background: #777777;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s ease;
+        text-decoration: none;
+    }
+
+    .pdf-btn:hover {
+        background: #3a3b3f;
+    }
+
+    .pdf-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #252628;
+    }
+
+    .pdf-canvas {
+        width: 95%;
+        height: auto;
+        display: block;
+        background: #111;
+        border-radius: 6px;
+    }
+</style>
+
+<div id="{{ $id }}" class="pdf-card">
+    <div class="pdf-controls">
+        <div class="nav-buttons">
+            <button class="pdf-btn pdf-prev">◀ Prev</button>
+            <button class="pdf-btn pdf-next">Next ▶</button>
+            <span class="pdf-page-info">
+                Page <span class="pdf-page">1</span> / <span class="pdf-pages">?</span>
+            </span>
+        </div>
+        <a class="pdf-btn pdf-download" href="{{ $pdf_url }}" download>⬇ Download</a>
+    </div>
+    <div class="pdf-container" style="height: {{ $height }};">
+        <canvas class="pdf-canvas"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.js"></script>
+<script>
+    (function () {
+        const container = document.getElementById("{{ $id }}");
+        if (!container) return;
+
+        const canvas = container.querySelector('.pdf-canvas');
+        const ctx = canvas.getContext('2d');
+        const prevBtn = container.querySelector('.pdf-prev');
+        const nextBtn = container.querySelector('.pdf-next');
+        const pageSpan = container.querySelector('.pdf-page');
+        const pagesSpan = container.querySelector('.pdf-pages');
+        const url = "{{ $pdf_url }}";
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.worker.js";
+
+        let pdfDoc = null;
+        let pageNum = 1;
+
+        function renderPage(num) {
+            pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale: 1 });
+                const containerWidth = container.querySelector('.pdf-container').clientWidth;
+                const scale = containerWidth / viewport.width;
+                const scaledViewport = page.getViewport({ scale: scale });
+
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = scaledViewport.width * dpr;
+                canvas.height = scaledViewport.height * dpr;
+                canvas.style.width = scaledViewport.width + 'px';
+                canvas.style.height = scaledViewport.height + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                page.render({ canvasContext: ctx, viewport: scaledViewport });
+                pageSpan.textContent = num;
+            });
+        }
+
+        pdfjsLib.getDocument(url).promise.then(pdf => {
+            pdfDoc = pdf;
+            pagesSpan.textContent = pdf.numPages;
+            renderPage(pageNum);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (pageNum <= 1) return;
+            pageNum--;
+            renderPage(pageNum);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            renderPage(pageNum);
+        });
+
+        window.addEventListener('resize', () => renderPage(pageNum));
+    })();
+</script>

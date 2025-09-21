@@ -37,7 +37,8 @@ We welcome and appreciate contributions from the community! Whether you want to 
 
 This is suitable for a *isolated* repo with hugo initialization.
 
-- You should have a isolated repo contains all your notes, then use `hugo mod init <your remote repo>` to initialize hugo module.
+- You should have a isolated repo contains all your notes, use `hugo mod init <your remote repo>` to initialize hugo module.
+- Upload your local repo in the remote repo like `github`.
 - (Optional) create a default template for header by placing below code in `/archetypes/default.md`:
 
 ```yaml
@@ -76,6 +77,51 @@ target = "content/posts/your-name/single-post.md"
 ```
 
 Where it place your `posts/` in `content/posts/your-name`. It's up to you to create your own path resolution.
+
+If you want to insert image or other assets, please be careful on your path resolution. The recommended choices compatible both for local view and hugo view are:
+
+- Page Bundle:
+
+Place the specific post as above where the markdown file should be named as **`index.md`**.
+
+```bash
+├── my-post-1/
+│   ├── index.md
+│   └── picture.png
+```
+
+Resolve path as `![a picture](picture.png)`.
+
+- Relative path in `static/`:
+
+There are two posts where share the same `asset/logo.png`.
+
+```bash
+My-Notes/
+  ├── post-1/
+  │    ├── index.md
+  │    └── picture.png
+  ├── post-2.md
+  └── assets/
+      └── logo.png
+```
+
+Then you should use relative link `![logo](assets/logo.png)`. To mount it in module as:
+
+```toml
+[[module.mounts]]
+source = "My-Notes/"
+target = "content/posts/your-name/"
+
+[[module.mounts]]
+source = "assets"
+target = "static/posts/your-name/assets"
+```
+
+Then given a file with link in `content/posts/your-name/post-2.md`, it is mapped as `/posts/your-name/post-2.md`,
+with assets mapped as `/post/your-name/assets/`, then relative link `assets/logo.png` resolves the correct path.
+
+You should be careful on those link relations preventing your path be broken.
 
 **Caveat**:
 
@@ -116,10 +162,18 @@ Where it place your `posts/` in `content/posts/your-name`. It's up to you to cre
 
 If you want to render latex, please place below inline or block:
 
-```md
+```
 $$
 x + y = 3 \
 $$
 
 The equation of $x^2 + y^2 = 1$ is ...
+```
+
+### Pdf
+
+We use [`hugo-pdf`](https://github.com/sytranvn/hugo-pdf) given by:
+
+```
+{{< pdf src="./path/to/pdf/file/example.pdf" >}}
 ```

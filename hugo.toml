@@ -1,7 +1,7 @@
 baseURL = "https://lvyuemeng.github.io/Nexus-Blog/"
 title = "Nexus"
 languageCode = 'en-us'
-theme = ["hugo-embed-pdf-shortcode", 'PaperMod']
+theme = ['PaperMod']
 enableInlineShortcodes = true
 
 [module]
