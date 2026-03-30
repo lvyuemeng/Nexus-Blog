@@ -4,17 +4,17 @@ We welcome and appreciate contributions from the community! Whether you want to 
 
 ## How to Contribute
 
-### Prerequisite
+### Prerequisites
 
 - `git`
-- `editor`(vscode/neovim ...)
+- An editor (VS Code, Neovim, etc.)
 
 ### 1. Contributing Code / Bug Fixes
 
-- Install `hugo` by [hugo installation](https://gohugo.io/installation/)
-- Report bugs or suggest features by [opening an issue](https://github.com/lvyuemeng/opencamp-blog/issues/new)
+- Install `hugo` via [Hugo installation](https://gohugo.io/installation/)
+- Report bugs or suggest features by [opening an issue](https://github.com/lvyuemeng/Nexus-Blog/issues/new)
 - Fork the repository
-- Create a feature/bugfix branch:  
+- Create a feature/bugfix branch:
   `git checkout -b feature/your-feature-name` or `git checkout -b fix/your-bugfix-name`
 - Commit your changes with descriptive messages
 - Push to your branch: `git push origin your-branch-name`
@@ -30,16 +30,16 @@ We welcome and appreciate contributions from the community! Whether you want to 
 
 #### Single Article
 
-- Following below criterion or `hugo new content <repo-root>/content/posts/<blog-name>` which will create header automatically.
-- Any possible variables for template could be checked on [Variables](https://hugo-docs.netlify.app/en/variables/page/) and [PaperMod-Wiki](https://github.com/adityatelange/hugo-PaperMod/wiki/Features)
+- Follow the criteria below, or use `hugo new content <repo-root>/content/posts/<blog-name>` which will create the front matter automatically.
+- Available template variables can be checked at [Variables](https://hugo-docs.netlify.app/en/variables/page/) and [PaperMod Wiki](https://github.com/adityatelange/hugo-PaperMod/wiki/Features).
 
 #### Multiple Articles
 
-This is suitable for a *isolated* repo with hugo initialization.
+This is suitable for an *isolated* repo with Hugo initialization.
 
-- You should have a isolated repo contains all your notes, use `hugo mod init <your remote repo>` to initialize hugo module.
-- Upload your local repo in the remote repo like `github`.
-- (Optional) create a default template for header by placing below code in `/archetypes/default.md`:
+- You should have an isolated repo containing all your notes. Use `hugo mod init <your remote repo>` to initialize the Hugo module.
+- Push your local repo to a remote like GitHub.
+- (Optional) Create a default archetype template by placing the code below in `/archetypes/default.md`:
 
 ```yaml
 ---
@@ -51,62 +51,62 @@ author: []
 ---
 ```
 
-However, it's optional to replace the format in `yaml/toml` or your custom template referring Hugo docs!
+You can replace the format with `yaml/toml` or your custom template. Refer to the Hugo docs for options.
 
-Then you could make new post by `hugo new -c "./your-dir" "post-name.md"` to create new posts, however, you **can't** create posts in **root-dir** because it will resolve the parent dir of your repo for archetypes template!
+Then create new posts with `hugo new -c "./your-dir" "post-name.md"`. Note: you **cannot** create posts in the **root dir** because Hugo resolves the parent dir for the archetype template.
 
-- In **Nexus** repo, insert your repo like this:
+- In the **Nexus** repo, add your module import:
 
 ```toml
 [module]
 [[module.imports]]
 ...
-path = "github.com/yourusername/your notes repo"
+path = "github.com/yourusername/your-notes-repo"
 ```
 
-- In **Your Notes** repo, insert your mounts path like this:
+- In **your notes** repo, add your mount paths:
 
 ```toml
 [[module.mounts]]
 source = "posts/"
-target = "content/posts/your-name" # <your-name> path to avoid confliction!
+target = "content/posts/your-name" # Use a unique path to avoid conflicts!
 
 [[module.mounts]]
 source = "posts/single-post.md"
 target = "content/posts/your-name/single-post.md"
 ```
 
-Where it place your `posts/` in `content/posts/your-name`. It's up to you to create your own path resolution.
+This places your `posts/` in `content/posts/your-name`. You control your own path resolution.
 
-If you want to insert image or other assets, please be careful on your path resolution. The recommended choices compatible both for local view and hugo view are:
+If you want to insert images or other assets, be careful with path resolution. The recommended choices compatible with both local viewing and Hugo are:
 
 - Page Bundle:
 
-Place the specific post as above where the markdown file should be named as **`index.md`**.
+Place the specific post as above where the markdown file should be named **`index.md`**.
 
-```bash
-├── my-post-1/
-│   ├── index.md
-│   └── picture.png
+```text
+my-post-1/
+  index.md
+  picture.png
 ```
 
 Resolve path as `![a picture](picture.png)`.
 
 - Relative path in `static/`:
 
-There are two posts where share the same `asset/logo.png`.
+Two posts sharing the same `assets/logo.png`:
 
-```bash
+```text
 My-Notes/
-  ├── post-1/
-  │    ├── index.md
-  │    └── picture.png
-  ├── post-2.md
-  └── assets/
-      └── logo.png
+  post-1/
+    index.md
+    picture.png
+  post-2.md
+  assets/
+    logo.png
 ```
 
-Then you should use relative link `![logo](assets/logo.png)`. To mount it in module as:
+Use relative link `![logo](assets/logo.png)`. Mount it in the module as:
 
 ```toml
 [[module.mounts]]
@@ -118,21 +118,21 @@ source = "assets"
 target = "static/posts/your-name/assets"
 ```
 
-Then given a file with link in `content/posts/your-name/post-2.md`, it is mapped as `/posts/your-name/post-2.md`,
-with assets mapped as `/post/your-name/assets/`, then relative link `assets/logo.png` resolves the correct path.
+Given a file with link in `content/posts/your-name/post-2.md`, it is mapped as `/posts/your-name/post-2.md`,
+with assets mapped as `/posts/your-name/assets/`, so the relative link `assets/logo.png` resolves correctly.
 
-You should be careful on those link relations preventing your path be broken.
+Be careful with link relations to prevent broken paths.
 
 **Caveat**:
 
-- If multiple person mounts the same path, `hugo` will merge all.
-- If the posts name is **same**, `hugo` will choose the priority one in import order.
-- Thus if you want to avoid confliction, please create a custom name!
+- If multiple people mount the same path, Hugo will merge all.
+- If the post names are **the same**, Hugo will choose the one with higher import priority.
+- To avoid conflicts, use a custom path name!
 
 ---
 
-- Check your content by `hugo server -D`(`-D` means draft shown)
-- If success, change `draft = true` to `draft = false`
+- Check your content with `hugo server -D` (`-D` means drafts are shown)
+- If successful, change `draft = true` to `draft = false`
 - Commit your changes and push to your branch
 - Open a Pull Request (PR) against the `main` branch
 
@@ -140,39 +140,129 @@ You should be careful on those link relations preventing your path be broken.
 
 ### Format
 
-- All articles should be written in Markdown (.md)
-- Place files in `content/posts/` directory
-- Follow naming convention: `your_article_title_YYYY-MM-DD.md`
-- Include proper front matter: 
+- All articles should be written in Markdown (`.md`)
+- Place files in the `content/posts/` directory
+- Follow the naming convention: `your_article_title.md`
+- Include proper front matter (TOML format):
 
-  ```md
-  ---
+  ```toml
+  +++
   title = "Your Article Title"
   date = YYYY-MM-DD
-  draft = true 
-  author = Your Name (or pseudonym)
-  tags = [tag1, tag2]
-  categories = [category1]
-  ---
-  
+  draft = true
+  author = ["Your Name"]
+  tags = ["tag1", "tag2"]
+  +++
+
   Your article content goes here...
   ```
 
-#### Latex
+#### LaTeX
 
-If you want to render latex, please place below inline or block:
+For inline or block math snippets in Markdown, use MathJax syntax rendered on the page:
 
-```
+```latex
 $$
-x + y = 3 \
+x + y = 3
 $$
 
 The equation of $x^2 + y^2 = 1$ is ...
 ```
 
-### Pdf
+LaTeX math delimiters: block uses `$$...$$` or `\[...\]`, inline uses `$...$` or `\(...\)`.
 
-We use [`hugo-pdf`](https://github.com/sytranvn/hugo-pdf) given by:
+For full LaTeX documents, compile to PDF and embed via the PDF shortcode.
+
+**Workflow**:
+
+1. Write your document (`.tex` file):
+
+```latex
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{My Article}
+\author{Your Name}
+\date{\today}
+\maketitle
+
+The equation of $x^2 + y^2 = 1$ defines a unit circle.
+
+\begin{equation}
+  \int_0^1 x^2 \, dx = \frac{1}{3}
+\end{equation}
+
+\end{document}
+```
+
+2. Compile to PDF:
+
+```bash
+pdflatex my-document.tex
+```
+
+Or use [Overleaf](https://www.overleaf.com/) to edit and compile online.
+
+3. Embed the compiled PDF in your Markdown post:
+
+```markdown
+{{< pdf src="./my-document.pdf" >}}
+```
+
+#### Typst
+
+[Typst](https://typst.app/) is a modern alternative to LaTeX for typesetting. The workflow is the same: compile to PDF and embed.
+
+**Workflow**:
+
+1. Write your document (`.typ` file):
+
+```typst
+#set page(width: 210mm, height: auto)
+#set text(font: "New Computer Modern", size: 12pt)
+
+= My Article
+
+The equation of $x^2 + y^2 = 1$ defines a unit circle.
+
+$
+  integral_0^1 x^2 dif x = 1/3
+$
+```
+
+2. Compile to PDF:
+
+```bash
+typst compile my-document.typ
+```
+
+Or use the [Typst Web App](https://typst.app/) to compile online.
+
+3. Embed the compiled PDF in your Markdown post:
+
+```markdown
+{{< pdf src="./my-document.pdf" >}}
+```
+
+**Typst vs LaTeX math quick reference**:
+
+| Feature | LaTeX | Typst |
+|---|---|---|
+| Inline math | `$x^2$` | `$x^2$` |
+| Block math | `$$...$$` | `$ ... $` |
+| Fractions | `\frac{a}{b}` | `a/b` or `(a)/(b)` |
+| Integral | `\int_0^1` | `integral_0^1` |
+| Sum | `\sum_{i=1}^{n}` | `sum_(i=1)^n` |
+| Square root | `\sqrt{x}` | `sqrt(x)` |
+| Greek letters | `\alpha, \beta` | `alpha, beta` |
+
+If you contribute LaTeX or Typst content, include the source file (`.tex` or `.typ`) alongside the compiled PDF so others can edit it.
+
+### PDF
+
+We use a custom PDF shortcode. Refer to `layouts/shortcodes/pdf.html` for implementation details.
 
 ```
 {{< pdf src="./path/to/pdf/file/example.pdf" >}}

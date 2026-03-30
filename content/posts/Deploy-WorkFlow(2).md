@@ -2,7 +2,8 @@
 date = '2025-03-24T22:53:47+08:00'
 draft = false
 title = 'Deploy WorkFlow(2)'
-tag = ["Deploy"]
+description = 'Guide to collaboration workflows: branch rules, pull requests, and interactive rebase for code review.'
+tags = ["Deploy"]
 author = ["nostalgia"]
 +++
 
@@ -10,9 +11,9 @@ author = ["nostalgia"]
 
 ### Rules
 
-You could set rules for collaboration and preventing safety issues.
+You can set rules for collaboration and to prevent safety issues.
 
-Usually, you want prevent someone modify `main` branch arbitrarily and restrict all push behavior after a carefully check on pr.
+Usually, you want to prevent someone from modifying the `main` branch arbitrarily and restrict all push behavior after a careful check on PRs.
 
 - Settings
   - Rules
@@ -20,12 +21,12 @@ Usually, you want prevent someone modify `main` branch arbitrarily and restrict 
     - restrict update
     - restrict deletions
     - block force pushes
-	
-Here are some simple block rules you want to set.
+
+Here are some simple block rules you may want to set.
 
 ### Pull Request
 
-You should create a new branch to circumvent awkward situation for your modification, you can create a new pull request to do this in ease.
+You should create a new branch to avoid conflicts with your modifications, then create a new pull request to submit changes.
 
 ```bash
 git checkout -b <new-branch-name>
@@ -36,34 +37,34 @@ Here `-b` means a new branch.
 After modification, you can push it.
 
 ```bash
-git push origin <branch-name> 
+git push origin <branch-name>
 ```
 
 Then create `New Pull Request` in the github repo, github will detect your remote push branch and suggest the pr format.
 
 ### Code Review
 
-Usually, a branch may contains many modification and diverge, you may want to keep it neat and readable. So, we can do the following:
+Usually, a branch may contain many modifications and diverge. You may want to keep it neat and readable. So, we can do the following:
 
 ```bash
 git rebase -i HEAD~<number>
 ```
 
-- `rebase` means merge the specified branch in linearization rather indicate a commit, currently we don't specify any branch, it means `rebase` itself.
-- '-i' means interactive
-- `HEAD~<number>` means to include your specify branch range from `HEAD` to its previous commits until `<number>` your specified.
+- `rebase` means merge the specified branch in linearization rather than indicating a commit; currently we don't specify any branch, so it means `rebase` itself.
+- `-i` means interactive
+- `HEAD~<number>` means to include your specified branch range from `HEAD` to its previous commits until `<number>`.
 
 Now git will open editor and show the content of commits.
 Here are verbs you should know:
 - pick(p): Include this commit in the final history as-is.
 - reword(r): Include this commit, but edit its commit message.
-- edit(e):Include this commit, but pause the rebase process to allow you to amend the commit.
+- edit(e): Include this commit, but pause the rebase process to allow you to amend the commit.
 - squash(s): Include this commit, but meld it into the previous commit.
 - fixup(f): Like squash, but discard this commit message.
 - drop(d): Remove this commit from the final history.
 
-The Above reference of **commit** include its content and message, so if you `drop` commit, it will remove all code it modifies and message!
+The above reference of **commit** includes its content and message, so if you `drop` a commit, it will remove all code it modifies and its message!
 
 ## Summary
 
-Here are all you want to do for a simple static blog deployment, including a bit of knowledges about git. You can refer [Git Book](https://git-scm.com/book/en/v2) if you want! Thanks for your reading!
+Here is all you need for a simple static blog deployment, including some git knowledge. You can refer to the [Git Book](https://git-scm.com/book/en/v2) if you want to learn more!

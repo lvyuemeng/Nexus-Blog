@@ -1,6 +1,6 @@
----
-title: "Search"
-layout: "search"
-summary: "search"
-placeholder: "Search Docs"
----
++++
+title = "Search"
+layout = "search"
+summary = "search"
+placeholder = "Search Docs"
++++

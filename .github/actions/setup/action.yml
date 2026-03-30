@@ -1,0 +1,94 @@
+name: Setup Hugo Toolchain
+description: >-
+  Installs Go, Node.js, Dart Sass, and Hugo (extended); restores binary and
+  asset caches; installs Node.js dependencies.
+
+inputs:
+  hugo-version:
+    description: Hugo version (e.g. "0.145.0"), or "latest".
+    default: "latest"
+  hugo-extended:
+    description: Install Hugo extended edition.
+    default: "true"
+  go-version:
+    description: Go version for actions/setup-go.
+    default: stable
+  node-version:
+    description: Node.js version for actions/setup-node.
+    default: lts/*
+  hugo-cache-key:
+    description: Cache key for Hugo assets/modules (use hashFiles() at call site).
+    required: true
+  hugo-cache-restore-keys:
+    description: Restore key prefix for Hugo cache fallback.
+    required: true
+
+outputs:
+  hugo-cache-key:
+    description: The primary cache key (passed through for save step).
+    value: ${{ steps.hugo-cache-restore.outputs.cache-primary-key }}
+
+runs:
+  using: composite
+  steps:
+    # ── Language runtimes ───────────────────────────────────────────────
+    # setup-go and setup-node have built-in caching.
+    - name: Setup Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: ${{ inputs.go-version }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    # ── Hugo ────────────────────────────────────────────────────────────
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v3
+      with:
+        hugo-version: ${{ inputs.hugo-version }}
+        extended: ${{ inputs.hugo-extended }}
+
+    # ── Dart Sass ───────────────────────────────────────────────────────
+    - name: Setup Dart
+      uses: dart-lang/setup-dart@v1
+
+    - name: Install Sass
+      shell: bash
+      run: |
+        dart pub global activate sass
+        echo "$(dart pub cache bin)" >> "$GITHUB_PATH"
+
+    # ── Sanity check ───────────────────────────────────────────────────
+    - name: Verify toolchain
+      shell: bash
+      run: |
+        echo "Go       : $(go version)"
+        echo "Node.js  : $(node --version)"
+        echo "Hugo     : $(hugo version)"
+        echo "Dart Sass: $(sass --version)"
+
+    # ── Git ─────────────────────────────────────────────────────────────
+    - name: Configure Git
+      shell: bash
+      run: git config core.quotepath false
+
+    # ── Node.js dependencies ────────────────────────────────────────────
+    - name: Install Node.js dependencies
+      shell: bash
+      run: |
+        if [[ -f package-lock.json || -f npm-shrinkwrap.json ]]; then
+          npm ci
+        else
+          echo "No lockfile found — skipping npm install."
+        fi
+
+    # ── Hugo module / asset cache ───────────────────────────────────────
+    - name: Restore Hugo asset cache
+      id: hugo-cache-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ runner.temp }}/hugo_cache
+        key: ${{ inputs.hugo-cache-key }}
+        restore-keys: ${{ inputs.hugo-cache-restore-keys }}

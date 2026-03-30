@@ -1,74 +1,74 @@
 baseURL = "https://lvyuemeng.github.io/Nexus-Blog/"
 title = "Nexus"
-languageCode = 'en-us'
-theme = ['PaperMod']
+languageCode = "en-us"
+defaultContentLanguage = "en"
+theme = ["PaperMod"]
 enableInlineShortcodes = true
+enableRobotsTXT = true
+ignoreLogs = ['warning-goldmark-raw-html']
 
 [module]
-[[module.imports]]
-path = "github.com/lvyuemeng/Noteloom"
+  [[module.imports]]
+    path = "github.com/lvyuemeng/Noteloom"
 
 [params]
-description = "A static blog platform for everyone!"
-author = ["nostalgia", "creatoy"]
-# enable math render
-math = true
+  description = "A static blog platform for everyone!"
+  author = ["nostalgia", "creatoy"]
+  math = true
+  showShareButtons = true
+  showReadingTime = true
+  showCodeCopyButtons = true
+  showToC = true
+  showBreadCrumbs = true
 
-[params.profileMode]
-enabled = true
-title = "Nexus"
-showShareButtons = true
-showReadingTime = true
-showCodeCopyButtons = true
-showToC = true
-showBreadCrumbs = true
+  [params.profileMode]
+    enabled = true
+    title = "Nexus"
 
-# Profile Links
-[[params.profileMode.buttons]]
-name = "Posts"
-url = "posts"
+    [[params.profileMode.buttons]]
+      name = "Posts"
+      url = "posts"
 
-[[params.profileMode.buttons]]
-name = "Tag"
-url = "tag"
+    [[params.profileMode.buttons]]
+      name = "Tag"
+      url = "tag"
 
-[[params.profileMode.buttons]]
-name = "Archives"
-url = "archives"
+    [[params.profileMode.buttons]]
+      name = "Archives"
+      url = "archives"
 
-[[params.profileMode.buttons]]
-name = "Search"
-url = "search"
+    [[params.profileMode.buttons]]
+      name = "Search"
+      url = "search"
 
-[[params.socialIcons]]
-name = "Github"
-url = "https://github.com/lvyuemeng/Nexus-blog"
+  [[params.socialIcons]]
+    name = "Github"
+    url = "https://github.com/lvyuemeng/Nexus-Blog"
 
-# Search Settings
-[params.fuseOpts]
-isCaseSensitive = false
-shouldSort = true
-location = 0
-distance = 1_000
-threshold = 0.4
-minMatchCharLength = 0
-keys = ["title", "permalink", "summary", "content"]
+  [params.fuseOpts]
+    isCaseSensitive = false
+    shouldSort = true
+    location = 0
+    distance = 1_000
+    threshold = 0.4
+    minMatchCharLength = 0
+    keys = ["title", "permalink", "summary", "content"]
 
 [outputs]
-home = ["HTML", "RSS", "JSON"]
+  home = ["HTML", "RSS", "JSON"]
 
 [markup]
-[markup.goldmark]
-[markup.goldmark.extensions]
-[markup.goldmark.extensions.passthrough]
-enable = true
-[markup.goldmark.extensions.passthrough.delimiters]
-block = [['\[', '\]'], ['$$', '$$']]
-inline = [['\(', '\)']]
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['\[', '\]'], ['$$', '$$']]
+          inline = [['\(', '\)']]
 
 [taxonomies]
-tag = "tag"
+  tag = "tag"
 
 [caches]
-[caches.images]
-dir = ':cacheDir/images'
+  [caches.images]
+    dir = ":cacheDir/images"

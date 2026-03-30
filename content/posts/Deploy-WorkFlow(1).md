@@ -2,13 +2,14 @@
 date = '2025-03-24T22:27:11+08:00'
 draft = false
 title = 'Deploy WorkFlow(1)'
-tag = ["Deploy"]
+description = 'A guide to deploying a static blog with Hugo, covering site creation, workflow configuration, and GitHub Pages setup.'
+tags = ["Deploy"]
 author = ["nostalgia"]
 +++
 
 # Deploy of Blog
 
-Here a record of deployment of static blog by `hugo`
+Here is a record of deploying a static blog with `hugo`.
 
 ## Preparation
 
@@ -37,7 +38,7 @@ theme = "PaperMod"
 
 ### Git Ignore
 
-Setting .gitignore to remove auto-generated content
+Set up `.gitignore` to remove auto-generated content:
 ```
 .hugo_build.lock
 public/
@@ -46,9 +47,9 @@ resources/
 
 ### Issue Template
 
-A readable template can help you classify issues, make it more understandable.
+A readable template can help you classify issues and make them more understandable.
 
-Setting issue template located in `.github/ISSUE_TEMPLATE` with:
+Set up issue templates located in `.github/ISSUE_TEMPLATE` with:
 ```
 bug_report.md
 feature_request.md
@@ -56,35 +57,32 @@ question_answer.md
 config.yml
 ```
 
-Here a part of demonstration:
+Here is a part of the demonstration:
 ```yaml
 blank_issues_enabled: false
 contact_links:
-  - name: 📃 Report Issue 
-    url: https://github.com/lvyuemeng/opencamp-blog/issues/new
+  - name: Report Issue
+    url: https://github.com/lvyuemeng/Nexus-Blog/issues/new
     description: Report a bug or request a feature
-  - name: 👀 Github Discussions
-    url: https://github.com/lvyuemeng/opencamp-blog/discussions
+  - name: Github Discussions
+    url: https://github.com/lvyuemeng/Nexus-Blog/discussions
     description: Ask a question or start a discussion
 ```
 
 ### Action
 
-A automated action can be used for deployment, test coverage in pr, etc. Currently, we set the 'deploy' and 'pr-validate' for such two cases.
+An automated action can be used for deployment, test coverage in PRs, etc. Currently, we set `deploy` and `pr-validate` for these two cases.
 
-Action can be decomposed to below main factors:
+Actions can be decomposed into the following main components:
 ```yaml
 name: <Workflow Name>          # Display name in Actions tab
 on: [<trigger events>]        # When to run the workflow
-jobs:                       # Group of tasks to execute
-  <job-name>:                 # Unique job identifier
-	environment(optional):
-		name: <env name>
-		url: <url name>
-    runs-on: <os-image>       # Execution environment
-    steps:                  # Sequential operations
-      - name: <Step Name>     # Human-readable step name
-        uses/run: <command>   # Action or shell command
+jobs:                          # Group of tasks to execute
+  <job-name>:                  # Unique job identifier
+    runs-on: <os-image>        # Execution environment
+    steps:                     # Sequential operations
+      - name: <Step Name>      # Human-readable step name
+        uses/run: <command>    # Action or shell command
 ```
 
 You can use others or given actions to ease your burden, for example:
@@ -103,44 +101,47 @@ You can use others or given actions to ease your burden, for example:
 
 #### Deploy
 
-Following `hugo` tutorial, you can deploy on `gihub`
+Following the `hugo` tutorial, you can deploy on `GitHub`:
 
 1. Go to the repo `Settings` and find `Pages`
 2. Switch the `Build and deployment`'s `Source` to `GitHub Actions`
 
-> [Deploy Action](.github/workflows/hugo-deploy.yml)
+> [Deploy Action](.github/workflows/hugo.yml)
 
-1. Install hugo CLI
+1. Install Hugo CLI
 2. Get PR Code
 3. Build Code
-4. Upload Site 
+4. Upload Site
 5. Deploy Site
 
 #### Pull Request Validation
 
-The logic is same.
+The logic is the same.
 
-> [Pr Validate Action](.github/workflows/pr-validate.yml)
+> [PR Validate Action](.github/workflows/pr-validate.yml)
 
-1. Install hugo CLI
+1. Install Hugo CLI
 2. Get PR Code
 3. Build Code
 4. Check `./public` consistency
 
 ## Beautify
 
-The ways to beautify your blog is based on your theme. Here [`PaperMod`](https://github.com/adityatelange/hugo-PaperMod/wiki/Features) provide various configurations, we list a part of it for our own:
+The ways to beautify your blog depend on your theme. [`PaperMod`](https://github.com/adityatelange/hugo-PaperMod/wiki/Features) provides various configurations. Here is a subset for reference:
 
 ```toml
-# Setting for a profile cover
-[params.profileMode]
-enabled = true
-title = "nostalgia"
+# Settings for PaperMod
+[params]
 showShareButtons = true
 showReadingTime = true
 showCodeCopyButtons = true
 showToC = true
 showBreadCrumbs = true
+
+# Setting for a profile cover
+[params.profileMode]
+enabled = true
+title = "Nexus"
 
 # Settings for search 
 [params.fuseOpts]

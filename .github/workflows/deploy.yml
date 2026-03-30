@@ -1,0 +1,69 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  HUGO_CACHEDIR: /tmp/hugo_cache
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup Hugo Toolchain
+        id: toolchain
+        uses: ./.github/actions/setup
+        with:
+          hugo-cache-key: hugo-${{ runner.os }}-${{ hashFiles('**/*.md', 'hugo.toml', 'go.sum') }}
+          hugo-cache-restore-keys: hugo-${{ runner.os }}-
+
+      - name: Build site
+        run: hugo --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/" --cacheDir "$HUGO_CACHEDIR"
+
+      - name: Save Hugo asset cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.HUGO_CACHEDIR }}
+          key: ${{ steps.toolchain.outputs.hugo-cache-key }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

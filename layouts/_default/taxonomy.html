@@ -1,20 +1,20 @@
-{{ define "main" }}
+{{- define "main" -}}
 
-{{- if .Title }}
+{{- if .Title -}}
 <header class="page-header">
-	<h1>{{ .Title }}</h1>
-	{{- if .Description }}
-	<div class="post-description">
-		{{ .Description }}
-	</div>
-	{{- end }}
+    <h1>{{ .Title }}</h1>
+    {{- with .Description -}}
+    <div class="post-description">
+        {{ . }}
+    </div>
+    {{- end -}}
 </header>
-{{- end }}
+{{- end -}}
 
 <ul class="terms-tags">
-	{{ range .Pages }}
-	<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
-	{{ end }}
+    {{- range .Pages -}}
+    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{- end -}}
 </ul>
 
-{{ end }}
+{{- end -}}

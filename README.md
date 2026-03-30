@@ -1,11 +1,10 @@
-**English** | **[简体中文](README-cn.md)** 
+**English** | **[简体中文](README-cn.md)**
 
-# [OpenCamp Blog](https://lvyuemeng.github.io/Nexus-Blog)
+# [Nexus Blog](https://lvyuemeng.github.io/Nexus-Blog/)
 
-A static blog deployment in hugo. Primarily derived from OpenCamp-Git.
+A static blog platform built with [Hugo](https://gohugo.io/) and the [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme.
 
-Currently built as a simple platform for your idea,
-if you want to share something, see **contributing**!
+If you want to share something, see **contributing**!
 
 ## Contributing
 
@@ -13,6 +12,6 @@ Bug reports, contributions and forks are welcome. All bugs or other forms of dis
 
 See more at [Contributing](./CONTRIBUTION.md)!
 
-## ⚖️ COPYRIGHT
+## License
 
-[Apache 2.0 License](./LICENSE) - CopyRight (C) 2025 by Nostalgia and [Contributors](https://github.com/lvyuemeng/Nexus-Blog/graphs/contributors)
+[Apache 2.0 License](./LICENSE) - Copyright (C) 2025 by Nostalgia and [Contributors](https://github.com/lvyuemeng/Nexus-Blog/graphs/contributors)
