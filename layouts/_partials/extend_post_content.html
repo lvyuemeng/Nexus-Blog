@@ -1,0 +1,24 @@
+{{- if eq .Type "pdf" -}}
+  {{- $document := .Param "document" -}}
+  {{- if not $document -}}
+    {{- errorf "%s: PDF post requires a nonempty document parameter" .Path -}}
+  {{- else -}}
+    {{- $resolved := partial "resolve-resource.html" (dict
+      "page" .
+      "destination" $document
+      "required" true
+      "allowRemote" false
+      "kind" "PDF"
+      "position" .Path
+    ) -}}
+    {{- with $resolved.resource -}}
+      {{- if ne .MediaType.Type "application/pdf" -}}
+        {{- errorf "%s: PDF document %q has media type %q; expected %q" $.Path $document .MediaType.Type "application/pdf" -}}
+      {{- else -}}
+        <div class="post-content">
+          {{- partial "pdf.html" (dict "page" $ "resource" . "position" $.Path) -}}
+        </div>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

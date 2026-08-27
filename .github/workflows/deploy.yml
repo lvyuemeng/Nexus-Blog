@@ -18,39 +18,34 @@ defaults:
   run:
     shell: bash
 
-env:
-  HUGO_CACHEDIR: /tmp/hugo_cache
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
+        uses: actions/checkout@v6
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Setup Hugo Toolchain
-        id: toolchain
-        uses: ./.github/actions/setup
+      - name: Setup Go
+        uses: actions/setup-go@v7
         with:
-          hugo-cache-key: hugo-${{ runner.os }}-${{ hashFiles('**/*.md', 'hugo.toml', 'go.sum') }}
-          hugo-cache-restore-keys: hugo-${{ runner.os }}-
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.165.0'
+          extended: true
+
+      - name: Verify note contract
+        run: go test ./... -count=1
 
       - name: Build site
-        run: hugo --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/" --cacheDir "$HUGO_CACHEDIR"
-
-      - name: Save Hugo asset cache
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.HUGO_CACHEDIR }}
-          key: ${{ steps.toolchain.outputs.hugo-cache-key }}
+        run: hugo --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

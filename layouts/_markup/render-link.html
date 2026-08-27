@@ -1,11 +1,5 @@
-{{- $parsed := urls.Parse .Destination -}}
-{{- $extension := lower (path.Ext $parsed.Path) -}}
-{{- $attachmentExtensions := slice
-  ".7z" ".bin" ".csv" ".doc" ".docx" ".epub" ".gz" ".json" ".ods"
-  ".odt" ".pdf" ".ppt" ".pptx" ".tar" ".tsv" ".txt" ".xls" ".xlsx" ".zip"
--}}
-{{- $isAttachment := in $attachmentExtensions $extension -}}
-{{- $resolved := partial "content/resolve-resource.html" (dict
+{{- $isAttachment := strings.HasPrefix .Destination "./" -}}
+{{- $resolved := partial "resolve-resource.html" (dict
   "page" .PageInner
   "destination" .Destination
   "required" $isAttachment

@@ -21,7 +21,7 @@ $$
 
 ![Nested diagram](images/detail.svg)
 
-[Download attachment](attachment.txt)
+[Download attachment](./attachment.txt)
 
 [Internal page](../target/)
 

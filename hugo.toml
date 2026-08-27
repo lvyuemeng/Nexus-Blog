@@ -1,20 +1,20 @@
-baseURL = "https://lvyuemeng.github.io/Nexus-Blog/"
+baseURL = "https://nostalume.github.io/Nexus-Blog/"
 title = "Nexus"
-languageCode = "en-us"
+locale = "en-US"
 defaultContentLanguage = "en"
-theme = ["PaperMod"]
-enableInlineShortcodes = true
 enableRobotsTXT = true
 ignoreLogs = ['warning-goldmark-raw-html']
 
 [module]
+  [[module.imports]]
+    path = "github.com/adityatelange/hugo-PaperMod"
+
   [[module.imports]]
     path = "github.com/lvyuemeng/Noteloom"
 
 [params]
   description = "A static blog platform for everyone!"
   author = ["nostalgia", "creatoy"]
-  math = true
   showShareButtons = true
   showReadingTime = true
   showCodeCopyButtons = true
@@ -43,7 +43,7 @@ ignoreLogs = ['warning-goldmark-raw-html']
 
   [[params.socialIcons]]
     name = "Github"
-    url = "https://github.com/lvyuemeng/Nexus-Blog"
+    url = "https://github.com/nostalume/Nexus-Blog"
 
   [params.fuseOpts]
     isCaseSensitive = false

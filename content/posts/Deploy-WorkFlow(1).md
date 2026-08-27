@@ -3,7 +3,7 @@ date = '2025-03-24T22:27:11+08:00'
 draft = false
 title = 'Deploy WorkFlow(1)'
 description = 'A guide to deploying a static blog with Hugo, covering site creation, workflow configuration, and GitHub Pages setup.'
-tags = ["Deploy"]
+tag = ["Deploy"]
 author = ["nostalgia"]
 +++
 
@@ -24,14 +24,15 @@ Toolchain:
 hugo new site <your-name>
 cd <your-name>
 git init
-git submodule add https://gitclone.com/github.com/adityatelange/hugo-PaperMod.git themes/PaperMod
+go mod init example.com/<your-name>
 ```
 
-Setting the theme to "PaperMod"
+Import PaperMod as a pinned Hugo module:
 
 ```toml
-# ... above content
-theme = "PaperMod"
+[module]
+  [[module.imports]]
+    path = "github.com/adityatelange/hugo-PaperMod"
 ```
 
 ## Workflow Configuration
@@ -62,10 +63,10 @@ Here is a part of the demonstration:
 blank_issues_enabled: false
 contact_links:
   - name: Report Issue
-    url: https://github.com/lvyuemeng/Nexus-Blog/issues/new
+    url: https://github.com/nostalume/Nexus-Blog/issues/new
     description: Report a bug or request a feature
   - name: Github Discussions
-    url: https://github.com/lvyuemeng/Nexus-Blog/discussions
+    url: https://github.com/nostalume/Nexus-Blog/discussions
     description: Ask a question or start a discussion
 ```
 

@@ -2,7 +2,7 @@
 {{- if not $source -}}
   {{- errorf "%s: pdf shortcode requires a nonempty src parameter" .Position -}}
 {{- else -}}
-  {{- $resolved := partial "content/resolve-resource.html" (dict
+  {{- $resolved := partial "resolve-resource.html" (dict
     "page" .Page
     "destination" $source
     "required" true
@@ -14,10 +14,11 @@
     {{- if ne .MediaType.Type "application/pdf" -}}
       {{- errorf "%s: PDF document %q has media type %q; expected %q" $.Position $source .MediaType.Type "application/pdf" -}}
     {{- else -}}
-      {{- partial "pdf/viewer.html" (dict
+      {{- partial "pdf.html" (dict
         "page" $.Page
         "resource" .
         "height" ($.Get "height")
+        "position" $.Position
       ) -}}
     {{- end -}}
   {{- end -}}

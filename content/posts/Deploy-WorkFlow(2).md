@@ -3,7 +3,7 @@ date = '2025-03-24T22:53:47+08:00'
 draft = false
 title = 'Deploy WorkFlow(2)'
 description = 'Guide to collaboration workflows: branch rules, pull requests, and interactive rebase for code review.'
-tags = ["Deploy"]
+tag = ["Deploy"]
 author = ["nostalgia"]
 +++
 

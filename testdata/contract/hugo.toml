@@ -1,8 +1,11 @@
 baseURL = "https://example.test/"
 title = "Nexus content contract"
 locale = "en-US"
-theme = ["PaperMod"]
 disableKinds = ["taxonomy", "term", "rss", "sitemap", "robotsTXT"]
+
+[module]
+  [[module.imports]]
+    path = "github.com/adityatelange/hugo-PaperMod"
 
 [markup]
   [markup.goldmark]
@@ -19,4 +22,3 @@ disableKinds = ["taxonomy", "term", "rss", "sitemap", "robotsTXT"]
   showShareButtons = false
   showPostNavLinks = false
   showCodeCopyButtons = false
-

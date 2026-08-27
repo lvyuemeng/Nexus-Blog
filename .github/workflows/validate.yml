@@ -8,51 +8,37 @@ defaults:
   run:
     shell: bash
 
-env:
-  HUGO_CACHEDIR: /tmp/hugo_cache
+permissions:
+  contents: read
 
 jobs:
   validate-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
-          submodules: recursive
-          # Pin to PR head so the build reflects exactly what was pushed.
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Setup Hugo Toolchain
-        id: toolchain
-        uses: ./.github/actions/setup
+      - name: Setup Go
+        uses: actions/setup-go@v7
         with:
-          # Exclude go.sum from PR cache key: PRs may update deps.
-          hugo-cache-key: hugo-${{ runner.os }}-${{ hashFiles('**/*.md', 'hugo.toml') }}
-          hugo-cache-restore-keys: hugo-${{ runner.os }}-
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.165.0'
+          extended: true
+
+      - name: Verify note contract
+        run: go test ./... -count=1
 
       - name: Build site (drafts + future posts)
-        run: hugo --gc --minify --buildDrafts --buildFuture --cacheDir "$HUGO_CACHEDIR"
+        run: hugo --gc --minify --buildDrafts --buildFuture
 
       - name: Verify build output
         run: |
-          [[ -d ./public ]] \
-            || { echo "Error: ./public directory not found."; exit 1; }
-
-          html_count=$(find ./public -name "*.html" | wc -l)
-          (( html_count > 0 )) \
-            || { echo "Error: no HTML files generated."; exit 1; }
-
-          [[ -f ./public/index.html ]] \
-            || { echo "Error: index.html missing."; exit 1; }
-
-          [[ -f ./public/404.html ]] \
-            || echo "Warning: 404.html missing."
-
-          echo "Build OK — ${html_count} HTML file(s) generated."
-
-      - name: Save Hugo asset cache
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.HUGO_CACHEDIR }}
-          key: ${{ steps.toolchain.outputs.hugo-cache-key }}
+          test -s public/index.html
+          find public -name '*.html' -print -quit | grep -q .

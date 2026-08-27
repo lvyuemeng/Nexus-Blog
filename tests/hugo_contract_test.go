@@ -34,6 +34,10 @@ func TestValidContentContract(t *testing.T) {
 	if strings.Contains(markdown, "typeset: false") {
 		t.Error("MathJax disables initial typesetting")
 	}
+	plainPage := readOutput(t, outputDir, "posts", "target", "index.html")
+	if strings.Contains(plainPage, "MathJax-script") {
+		t.Error("page without math opt-in loads MathJax")
+	}
 
 	for _, resource := range [][]string{
 		{"posts", "markdown", "diagram.svg"},
@@ -46,41 +50,51 @@ func TestValidContentContract(t *testing.T) {
 	}
 
 	pdfPage := readOutput(t, outputDir, "posts", "pdf", "index.html")
-	for _, expected := range []string{`data-pdf-viewer`, `/posts/pdf/paper.pdf`, `pdfjs-dist@6.2.108`} {
+	for _, expected := range []string{`<object`, `type="application/pdf"`, `/posts/pdf/paper.pdf`, `Download PDF`} {
 		if !strings.Contains(pdfPage, expected) {
 			t.Errorf("PDF output missing %q", expected)
 		}
 	}
+	if strings.Contains(pdfPage, "pdfjs-dist") {
+		t.Error("PDF output still loads the retired PDF.js runtime")
+	}
 
 	legacyPage := readOutput(t, outputDir, "posts", "legacy-pdf", "index.html")
-	for _, expected := range []string{`data-pdf-viewer`, `/posts/legacy-pdf/legacy.pdf`, `pdfjs-dist@6.2.108`} {
+	for _, expected := range []string{`<object`, `type="application/pdf"`, `/posts/legacy-pdf/legacy.pdf`, `Download PDF`} {
 		if !strings.Contains(legacyPage, expected) {
 			t.Errorf("legacy PDF output missing %q", expected)
 		}
+	}
+	if strings.Contains(legacyPage, "pdfjs-dist") {
+		t.Error("legacy PDF output still loads the retired PDF.js runtime")
 	}
 }
 
 func TestInvalidContentContract(t *testing.T) {
 	tests := []struct {
-		fixture string
-		message string
+		name        string
+		frontMatter string
+		body        string
+		files       map[string]string
+		message     string
 	}{
-		{fixture: "missing-image", message: `required image resource "missing.png"`},
-		{fixture: "missing-attachment", message: `required attachment resource "missing.pdf"`},
-		{fixture: "missing-pdf", message: `required PDF resource "missing.pdf"`},
-		{fixture: "empty-pdf", message: "PDF post requires a nonempty document parameter"},
-		{fixture: "non-pdf-document", message: `PDF document "note.txt" has media type "text/plain"`},
-		{fixture: "root-relative-image", message: `required image resource "/images/missing.png" must be a bundle-relative path`},
-		{fixture: "traversal-image", message: `required image resource "../shared/missing.png" must be a bundle-relative path`},
-		{fixture: "remote-pdf", message: `required PDF resource "https://example.com/paper.pdf" must be a bundle-relative path`},
-		{fixture: "machine-image", message: `required image resource "C:/notes/image.png" must be a bundle-relative path or use a permitted remote protocol`},
+		{name: "missing-image", body: `![Missing](missing.png)`, message: `required image resource "missing.png"`},
+		{name: "missing-attachment", body: `[Missing](./missing.dataset)`, message: `required attachment resource "./missing.dataset"`},
+		{name: "missing-pdf", frontMatter: "type: pdf\ndocument: missing.pdf\n", message: `required PDF resource "missing.pdf"`},
+		{name: "empty-pdf", frontMatter: "type: pdf\ndocument: \"\"\n", message: "PDF post requires a nonempty document parameter"},
+		{name: "non-pdf-document", frontMatter: "type: pdf\ndocument: note.txt\n", files: map[string]string{"note.txt": "not a PDF\n"}, message: `PDF document "note.txt" has media type "text/plain"`},
+		{name: "root-relative-image", body: `![Invalid](/images/missing.png)`, message: `required image resource "/images/missing.png" must be a bundle-relative path`},
+		{name: "traversal-image", body: `![Invalid](../shared/missing.png)`, message: `required image resource "../shared/missing.png" must be a bundle-relative path`},
+		{name: "remote-pdf", frontMatter: "type: pdf\ndocument: https://example.com/paper.pdf\n", message: `required PDF resource "https://example.com/paper.pdf" must be a bundle-relative path`},
+		{name: "machine-image", body: `![Invalid](C:/notes/image.png)`, message: `required image resource "C:/notes/image.png" must be a bundle-relative path or use a permitted remote protocol`},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.fixture, func(t *testing.T) {
-			_, log, err := buildFixture(t, tt.fixture)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			_, log, err := buildInvalidFixture(t, tt.frontMatter, tt.body, tt.files)
 			if err == nil {
-				t.Fatalf("expected Hugo to reject %s", tt.fixture)
+				t.Fatalf("expected Hugo to reject %s", tt.name)
 			}
 			if !strings.Contains(log, tt.message) {
 				t.Fatalf("failure did not contain %q:\n%s", tt.message, log)
@@ -91,12 +105,41 @@ func TestInvalidContentContract(t *testing.T) {
 
 func buildFixture(t *testing.T, fixture string) (string, string, error) {
 	t.Helper()
+	root := projectRoot(t)
+	return buildContentDir(t, root, filepath.Join(root, "testdata", "contract", fixture))
+}
+
+func buildInvalidFixture(t *testing.T, frontMatter, body string, files map[string]string) (string, string, error) {
+	t.Helper()
+	contentDir := t.TempDir()
+	bundleDir := filepath.Join(contentDir, "posts", "broken")
+	if err := os.MkdirAll(bundleDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	content := "---\ntitle: Broken contract\ndate: 2026-08-27\ndraft: false\n" + frontMatter + "---\n\n" + body + "\n"
+	if err := os.WriteFile(filepath.Join(bundleDir, "index.md"), []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for name, data := range files {
+		if err := os.WriteFile(filepath.Join(bundleDir, name), []byte(data), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return buildContentDir(t, projectRoot(t), contentDir)
+}
+
+func projectRoot(t *testing.T) string {
+	t.Helper()
 
 	_, sourceFile, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("cannot locate test source")
 	}
-	root := filepath.Clean(filepath.Join(filepath.Dir(sourceFile), ".."))
+	return filepath.Clean(filepath.Join(filepath.Dir(sourceFile), ".."))
+}
+
+func buildContentDir(t *testing.T, root, contentDir string) (string, string, error) {
+	t.Helper()
 	hugo, err := exec.LookPath("hugo")
 	if err != nil {
 		t.Fatal("hugo executable is required")
@@ -108,7 +151,7 @@ func buildFixture(t *testing.T, fixture string) (string, string, error) {
 		hugo,
 		"--source", root,
 		"--config", filepath.Join(root, "testdata", "contract", "hugo.toml"),
-		"--contentDir", filepath.Join(root, "testdata", "contract", fixture),
+		"--contentDir", contentDir,
 		"--destination", outputDir,
 		"--cacheDir", filepath.Join(temp, "cache"),
 		"--noBuildLock",

@@ -1,0 +1,12 @@
+{{- $resource := .resource -}}
+{{- $height := .height | default "80vh" -}}
+{{- if not (findRE `^[0-9]+(?:\.[0-9]+)?(?:px|vh|vw|rem|em|%)$` $height) -}}
+  {{- errorf "%s: PDF height %q is invalid" (.position | default .page.Path) $height -}}
+{{- end -}}
+<object
+  data="{{ $resource.RelPermalink }}"
+  type="application/pdf"
+  aria-label="PDF: {{ .page.Title }}"
+  style="width: 100%; height: {{ $height }};">
+  <p><a href="{{ $resource.RelPermalink }}" download>Download PDF</a></p>
+</object>

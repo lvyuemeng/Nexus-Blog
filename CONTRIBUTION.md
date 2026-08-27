@@ -1,269 +1,100 @@
-# Contribution Guidelines
+# Contributing notes
 
-We welcome and appreciate contributions from the community! Whether you want to fix a typo, improve code, add new features, or submit guest posts, please follow these guidelines to ensure a smooth collaboration process.
+Nexus owns the Hugo theme, rendering rules, validation, CI, and deployment.
+Contributors provide portable Markdown or PDF page bundles; do not copy Nexus
+layouts, scripts, or machine-specific paths into a note repository.
 
-## How to Contribute
+## Markdown notes
 
-### Prerequisites
+A note without local files may be a single Markdown file. When a note includes
+images, attachments, or other resources, use a Hugo leaf bundle:
 
-- `git`
-- An editor (VS Code, Neovim, etc.)
+```text
+my-note/
+  index.md
+  diagram.svg
+  results.dataset
+  images/
+    detail.png
+```
 
-### 1. Contributing Code / Bug Fixes
+Images are relative to `index.md`:
 
-- Install `hugo` via [Hugo installation](https://gohugo.io/installation/)
-- Report bugs or suggest features by [opening an issue](https://github.com/lvyuemeng/Nexus-Blog/issues/new)
-- Fork the repository
-- Create a feature/bugfix branch:
-  `git checkout -b feature/your-feature-name` or `git checkout -b fix/your-bugfix-name`
-- Commit your changes with descriptive messages
-- Push to your branch: `git push origin your-branch-name`
-- Open a Pull Request (PR) against the `main` branch
+```markdown
+![Overview](diagram.svg)
+![Detail](images/detail.png)
+```
 
----
+Use an explicit `./` prefix for downloadable bundle attachments. This works for
+any file extension and distinguishes an attachment from navigation to another
+page:
 
-### 2. Contributing Articles
+```markdown
+[Download the results](./results.dataset)
+```
 
-- Create a new branch for each article: `git checkout -b new_branch`
+Missing local images and explicit attachments fail the build. Remote `http` and
+`https` URLs remain valid. Root-relative paths, machine paths, and `../`
+cross-bundle traversal are not portable note resources.
 
----
+## Math
 
-#### Single Article
-
-- Follow the criteria below, or use `hugo new content <repo-root>/content/posts/<blog-name>` which will create the front matter automatically.
-- Available template variables can be checked at [Variables](https://hugo-docs.netlify.app/en/variables/page/) and [PaperMod Wiki](https://github.com/adityatelange/hugo-PaperMod/wiki/Features).
-
-#### Multiple Articles
-
-This is suitable for an *isolated* repo with Hugo initialization.
-
-- You should have an isolated repo containing all your notes. Use `hugo mod init <your remote repo>` to initialize the Hugo module.
-- Push your local repo to a remote like GitHub.
-- (Optional) Create a default archetype template by placing the code below in `/archetypes/default.md`:
+Declare math on pages that need it:
 
 ```yaml
 ---
-title: '{{ replace .File.ContentBaseName "-" " " | title }}'
-date: {{ .Date }}
-draft: true
-tags: []
-author: []
+title: "A mathematical note"
+date: 2026-08-27
+math: true
 ---
 ```
 
-You can replace the format with `yaml/toml` or your custom template. Refer to the Hugo docs for options.
+Supported delimiters are `\(...\)` for inline math and `\[...\]` or `$$...$$`
+for display math.
 
-Then create new posts with `hugo new -c "./your-dir" "post-name.md"`. Note: you **cannot** create posts in the **root dir** because Hugo resolves the parent dir for the archetype template.
+## PDF posts
 
-- In the **Nexus** repo, add your module import:
-
-```toml
-[module]
-[[module.imports]]
-...
-path = "github.com/yourusername/your-notes-repo"
-```
-
-- In **your notes** repo, add your mount paths:
-
-```toml
-[[module.mounts]]
-source = "posts/"
-target = "content/posts/your-name" # Use a unique path to avoid conflicts!
-
-[[module.mounts]]
-source = "posts/single-post.md"
-target = "content/posts/your-name/single-post.md"
-```
-
-This places your `posts/` in `content/posts/your-name`. You control your own path resolution.
-
-If you want to insert images or other assets, be careful with path resolution. The recommended choices compatible with both local viewing and Hugo are:
-
-- Page Bundle:
-
-Place the specific post as above where the markdown file should be named **`index.md`**.
+A PDF post is a leaf bundle with a small metadata wrapper:
 
 ```text
-my-post-1/
+paper/
   index.md
-  picture.png
+  paper.pdf
 ```
 
-Resolve path as `![a picture](picture.png)`.
-
-- Relative path in `static/`:
-
-Two posts sharing the same `assets/logo.png`:
-
-```text
-My-Notes/
-  post-1/
-    index.md
-    picture.png
-  post-2.md
-  assets/
-    logo.png
-```
-
-Use relative link `![logo](assets/logo.png)`. Mount it in the module as:
-
-```toml
-[[module.mounts]]
-source = "My-Notes/"
-target = "content/posts/your-name/"
-
-[[module.mounts]]
-source = "assets"
-target = "static/posts/your-name/assets"
-```
-
-Given a file with link in `content/posts/your-name/post-2.md`, it is mapped as `/posts/your-name/post-2.md`,
-with assets mapped as `/posts/your-name/assets/`, so the relative link `assets/logo.png` resolves correctly.
-
-Be careful with link relations to prevent broken paths.
-
-**Caveat**:
-
-- If multiple people mount the same path, Hugo will merge all.
-- If the post names are **the same**, Hugo will choose the one with higher import priority.
-- To avoid conflicts, use a custom path name!
-
+```yaml
 ---
-
-- Check your content with `hugo server -D` (`-D` means drafts are shown)
-- If successful, change `draft = true` to `draft = false`
-- Commit your changes and push to your branch
-- Open a Pull Request (PR) against the `main` branch
-
+title: "Paper title"
+date: 2026-08-27
+type: pdf
+document: paper.pdf
 ---
-
-### Format
-
-- All articles should be written in Markdown (`.md`)
-- Place files in the `content/posts/` directory
-- Follow the naming convention: `your_article_title.md`
-- Include proper front matter (TOML format):
-
-  ```toml
-  +++
-  title = "Your Article Title"
-  date = YYYY-MM-DD
-  draft = true
-  author = ["Your Name"]
-  tags = ["tag1", "tag2"]
-  +++
-
-  Your article content goes here...
-  ```
-
-#### LaTeX
-
-For inline or block math snippets in Markdown, use MathJax syntax rendered on the page:
-
-```latex
-$$
-x + y = 3
-$$
-
-The equation of $x^2 + y^2 = 1$ is ...
 ```
 
-LaTeX math delimiters: block uses `$$...$$` or `\[...\]`, inline uses `$...$` or `\(...\)`.
+`document` must identify a colocated PDF. Nexus publishes it, embeds the native
+browser PDF view, and provides a download fallback. The legacy `pdf` shortcode
+is compatibility-only and must not be used for new notes.
 
-For full LaTeX documents, compile to PDF and embed via the PDF shortcode.
+## Ways to contribute
 
-**Workflow**:
+- Occasional contributors submit a namespaced page bundle to the shared content
+  repository selected by the maintainers.
+- Independent authors may maintain a minimal Hugo module containing their notes,
+  resources, `go.mod`, and content mount. Nexus must explicitly review,
+  namespace, and pin each module before it becomes part of the site.
 
-1. Write your document (`.tex` file):
+See Hugo's [module documentation](https://gohugo.io/hugo-modules/) for the
+upstream module format. A provider module owns content only; host layouts,
+MathJax, PDF presentation, validation, and deployment stay in Nexus.
 
-```latex
-\documentclass{article}
-\usepackage{amsmath}
+## Verify Nexus
 
-\begin{document}
+From the Nexus repository root, with Go and Hugo Extended installed:
 
-\title{My Article}
-\author{Your Name}
-\date{\today}
-\maketitle
-
-The equation of $x^2 + y^2 = 1$ defines a unit circle.
-
-\begin{equation}
-  \int_0^1 x^2 \, dx = \frac{1}{3}
-\end{equation}
-
-\end{document}
+```sh
+go test ./... -count=1
+hugo --gc --minify
 ```
 
-2. Compile to PDF:
-
-```bash
-pdflatex my-document.tex
-```
-
-Or use [Overleaf](https://www.overleaf.com/) to edit and compile online.
-
-3. Embed the compiled PDF in your Markdown post:
-
-```markdown
-{{< pdf src="./my-document.pdf" >}}
-```
-
-#### Typst
-
-[Typst](https://typst.app/) is a modern alternative to LaTeX for typesetting. The workflow is the same: compile to PDF and embed.
-
-**Workflow**:
-
-1. Write your document (`.typ` file):
-
-```typst
-#set page(width: 210mm, height: auto)
-#set text(font: "New Computer Modern", size: 12pt)
-
-= My Article
-
-The equation of $x^2 + y^2 = 1$ defines a unit circle.
-
-$
-  integral_0^1 x^2 dif x = 1/3
-$
-```
-
-2. Compile to PDF:
-
-```bash
-typst compile my-document.typ
-```
-
-Or use the [Typst Web App](https://typst.app/) to compile online.
-
-3. Embed the compiled PDF in your Markdown post:
-
-```markdown
-{{< pdf src="./my-document.pdf" >}}
-```
-
-**Typst vs LaTeX math quick reference**:
-
-| Feature | LaTeX | Typst |
-|---|---|---|
-| Inline math | `$x^2$` | `$x^2$` |
-| Block math | `$$...$$` | `$ ... $` |
-| Fractions | `\frac{a}{b}` | `a/b` or `(a)/(b)` |
-| Integral | `\int_0^1` | `integral_0^1` |
-| Sum | `\sum_{i=1}^{n}` | `sum_(i=1)^n` |
-| Square root | `\sqrt{x}` | `sqrt(x)` |
-| Greek letters | `\alpha, \beta` | `alpha, beta` |
-
-If you contribute LaTeX or Typst content, include the source file (`.tex` or `.typ`) alongside the compiled PDF so others can edit it.
-
-### PDF
-
-We use a custom PDF shortcode. Refer to `layouts/shortcodes/pdf.html` for implementation details.
-
-```
-{{< pdf src="./path/to/pdf/file/example.pdf" >}}
-```
+The first command verifies valid and intentionally invalid note fixtures. The
+second proves the pinned provider revisions integrate with the production host.
