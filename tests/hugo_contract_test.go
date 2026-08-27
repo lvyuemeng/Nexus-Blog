@@ -44,7 +44,6 @@ func TestValidContentContract(t *testing.T) {
 		{"posts", "markdown", "images", "detail.svg"},
 		{"posts", "markdown", "attachment.txt"},
 		{"posts", "pdf", "paper.pdf"},
-		{"posts", "legacy-pdf", "legacy.pdf"},
 	} {
 		assertOutputExists(t, outputDir, resource...)
 	}
@@ -59,15 +58,6 @@ func TestValidContentContract(t *testing.T) {
 		t.Error("PDF output still loads the retired PDF.js runtime")
 	}
 
-	legacyPage := readOutput(t, outputDir, "posts", "legacy-pdf", "index.html")
-	for _, expected := range []string{`<object`, `type="application/pdf"`, `/posts/legacy-pdf/legacy.pdf`, `Download PDF`} {
-		if !strings.Contains(legacyPage, expected) {
-			t.Errorf("legacy PDF output missing %q", expected)
-		}
-	}
-	if strings.Contains(legacyPage, "pdfjs-dist") {
-		t.Error("legacy PDF output still loads the retired PDF.js runtime")
-	}
 }
 
 func TestInvalidContentContract(t *testing.T) {

@@ -72,8 +72,8 @@ document: paper.pdf
 ```
 
 `document` must identify a colocated PDF. Nexus publishes it, embeds the native
-browser PDF view, and provides a download fallback. The legacy `pdf` shortcode
-is compatibility-only and must not be used for new notes.
+browser PDF view, and provides a download fallback. Rendering shortcodes are not
+part of the posting contract.
 
 ## Ways to contribute
 

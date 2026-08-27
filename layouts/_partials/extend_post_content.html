@@ -16,7 +16,13 @@
         {{- errorf "%s: PDF document %q has media type %q; expected %q" $.Path $document .MediaType.Type "application/pdf" -}}
       {{- else -}}
         <div class="post-content">
-          {{- partial "pdf.html" (dict "page" $ "resource" . "position" $.Path) -}}
+          <object
+            data="{{ .RelPermalink }}"
+            type="application/pdf"
+            aria-label="PDF: {{ $.Title }}"
+            style="width: 100%; height: 80vh;">
+            <p><a href="{{ .RelPermalink }}" download>Download PDF</a></p>
+          </object>
         </div>
       {{- end -}}
     {{- end -}}
