@@ -93,6 +93,33 @@ func TestInvalidContentContract(t *testing.T) {
 	}
 }
 
+func TestNoLegacyNamespace(t *testing.T) {
+	root := projectRoot(t)
+	legacy := "lvyue" + "meng"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() && (info.Name() == ".git" || info.Name() == ".agents") {
+			return filepath.SkipDir
+		}
+		if info.IsDir() {
+			return nil
+		}
+		content, readErr := os.ReadFile(path)
+		if readErr != nil {
+			return readErr
+		}
+		if strings.Contains(strings.ToLower(string(content)), legacy) {
+			t.Errorf("legacy namespace found in %s", path)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func buildFixture(t *testing.T, fixture string) (string, string, error) {
 	t.Helper()
 	root := projectRoot(t)
