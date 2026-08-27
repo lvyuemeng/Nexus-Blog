@@ -16,3 +16,6 @@ Thumbs.db
 
 # Go module cache
 vendor/
+
+# Local architecture and implementation plans
+/.agents/

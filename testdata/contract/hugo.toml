@@ -1,0 +1,22 @@
+baseURL = "https://example.test/"
+title = "Nexus content contract"
+locale = "en-US"
+theme = ["PaperMod"]
+disableKinds = ["taxonomy", "term", "rss", "sitemap", "robotsTXT"]
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['\[', '\]'], ['$$', '$$']]
+          inline = [['\(', '\)']]
+
+[params]
+  showBreadCrumbs = false
+  showReadingTime = false
+  showShareButtons = false
+  showPostNavLinks = false
+  showCodeCopyButtons = false
+

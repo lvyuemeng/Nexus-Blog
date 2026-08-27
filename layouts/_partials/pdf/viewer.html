@@ -1,0 +1,35 @@
+{{- $page := .page -}}
+{{- $resource := .resource -}}
+{{- $height := .height | default "80vh" -}}
+
+<div
+  class="pdf-card"
+  role="region"
+  aria-label="PDF viewer"
+  data-pdf-viewer
+  data-pdf-url="{{ $resource.RelPermalink }}"
+  style="--pdf-height: {{ $height }};">
+  <div class="pdf-controls">
+    <div class="pdf-nav-buttons">
+      <button class="pdf-btn pdf-prev" type="button" aria-label="Previous page" disabled>◀ Prev</button>
+      <button class="pdf-btn pdf-next" type="button" aria-label="Next page" disabled>Next ▶</button>
+      <span class="pdf-page-info">
+        Page <span class="pdf-page">1</span> / <span class="pdf-pages">?</span>
+      </span>
+    </div>
+    <a class="pdf-btn pdf-download" href="{{ $resource.RelPermalink }}" download>⬇ Download</a>
+  </div>
+  <div class="pdf-container">
+    <div class="pdf-loading">Loading PDF…</div>
+    <canvas class="pdf-canvas" hidden></canvas>
+  </div>
+</div>
+
+<noscript>
+  <p><a href="{{ $resource.RelPermalink }}">Download PDF</a> (JavaScript is required for inline viewing.)</p>
+</noscript>
+
+{{- if not ($page.Store.Get "nexus-pdf-assets") -}}
+  {{- $page.Store.Set "nexus-pdf-assets" true -}}
+  {{- partial "pdf/assets.html" . -}}
+{{- end -}}

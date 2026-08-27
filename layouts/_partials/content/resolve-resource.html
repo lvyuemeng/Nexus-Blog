@@ -1,0 +1,63 @@
+{{- $page := .page -}}
+{{- $destination := .destination | default "" -}}
+{{- $required := .required | default false -}}
+{{- $allowRemote := true -}}
+{{- if isset . "allowRemote" -}}
+  {{- $allowRemote = .allowRemote -}}
+{{- end -}}
+{{- $resourceKind := .kind | default "local" -}}
+{{- $source := .position | default $page.Path -}}
+{{- $result := dict "classification" "navigation" "url" $destination "resource" false -}}
+
+{{- $parsed := urls.Parse $destination -}}
+{{- $scheme := lower $parsed.Scheme -}}
+{{- $permittedSchemes := slice "data" "http" "https" "mailto" "tel" -}}
+{{- $isMachinePath := gt (len (findRE `^[A-Za-z]:[\\/]` $destination)) 0 -}}
+{{- $isRemote := or
+  (strings.HasPrefix $destination "//")
+  (and $parsed.IsAbs (in $permittedSchemes $scheme))
+-}}
+{{- $hasUnsupportedScheme := and $parsed.IsAbs (not $isRemote) -}}
+{{- $isFragment := strings.HasPrefix $destination "#" -}}
+
+{{- if and $required (or $isMachinePath $hasUnsupportedScheme) -}}
+  {{- errorf "%s: required %s resource %q must be a bundle-relative path or use a permitted remote protocol" $source $resourceKind $destination -}}
+  {{- $result = dict "classification" "invalid" "url" $destination "resource" false -}}
+{{- else if and $isRemote (not $allowRemote) -}}
+  {{- errorf "%s: required %s resource %q must be a bundle-relative path" $source $resourceKind $destination -}}
+  {{- $result = dict "classification" "invalid" "url" $destination "resource" false -}}
+{{- else if or $isRemote $isFragment -}}
+  {{- $result = dict "classification" "passthrough" "url" $parsed.String "resource" false -}}
+{{- else -}}
+  {{- $resourcePath := strings.TrimPrefix "./" $parsed.Path -}}
+  {{- $invalidPath := or
+    (eq $resourcePath "")
+    (strings.HasPrefix $parsed.Path "/")
+    (strings.Contains $resourcePath "\\")
+    (gt (len (findRE `(^|/)\.\.(/|$)` $resourcePath)) 0)
+    $isMachinePath
+  -}}
+
+  {{- if and $required $invalidPath -}}
+    {{- errorf "%s: required %s resource %q must be a bundle-relative path" $source $resourceKind $destination -}}
+    {{- $result = dict "classification" "invalid" "url" $destination "resource" false -}}
+  {{- else if not $invalidPath -}}
+    {{- with $page.Resources.Get $resourcePath -}}
+      {{- $url := .RelPermalink -}}
+      {{- with $parsed.RawQuery -}}
+        {{- $url = printf "%s?%s" $url . -}}
+      {{- end -}}
+      {{- with $parsed.Fragment -}}
+        {{- $url = printf "%s#%s" $url . -}}
+      {{- end -}}
+      {{- $result = dict "classification" "resource" "url" $url "resource" . -}}
+    {{- else -}}
+      {{- if $required -}}
+        {{- errorf "%s: required %s resource %q was not found in page bundle %q" $source $resourceKind $destination $page.Path -}}
+        {{- $result = dict "classification" "missing" "url" $destination "resource" false -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return $result -}}
