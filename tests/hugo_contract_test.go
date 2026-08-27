@@ -120,6 +120,46 @@ func TestNoLegacyNamespace(t *testing.T) {
 	}
 }
 
+func TestPublishedProviderSurface(t *testing.T) {
+	root := projectRoot(t)
+	temp := t.TempDir()
+	outputDir := filepath.Join(temp, "public")
+	cmd := exec.Command(
+		"hugo",
+		"--source", root,
+		"--destination", outputDir,
+		"--cacheDir", filepath.Join(temp, "cache"),
+		"--noBuildLock",
+		"--printPathWarnings",
+	)
+	cmd.Env = append(os.Environ(), "HUGO_ENVIRONMENT=production")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("production provider build failed: %v\n%s", err, output)
+	}
+
+	sitemap := readOutput(t, outputDir, "sitemap.xml")
+	retained := "/posts/nostalgia/physics/sr/"
+	if !strings.Contains(sitemap, retained) {
+		t.Errorf("published provider surface missing retained route %q", retained)
+	}
+	for _, withdrawn := range []string{
+		"/posts/nostalgia/arena/",
+		"/posts/nostalgia/ipc/",
+		"/posts/nostalgia/uring/",
+		"/posts/nostalgia/ariel-os/",
+		"/posts/nostalgia/axembassy-develop/",
+		"/posts/nostalgia/axembassy-measure/",
+		"/posts/nostalgia/axembassy-preempt/",
+		"/posts/nostalgia/axembassy-summary/",
+		"/posts/nostalgia/embassy/",
+		"/posts/nostalgia/report/",
+	} {
+		if strings.Contains(sitemap, withdrawn) {
+			t.Errorf("published provider surface still contains withdrawn route %q", withdrawn)
+		}
+	}
+}
+
 func buildFixture(t *testing.T, fixture string) (string, string, error) {
 	t.Helper()
 	root := projectRoot(t)
