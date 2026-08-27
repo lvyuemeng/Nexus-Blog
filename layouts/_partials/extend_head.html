@@ -1,9 +1,11 @@
-{{- if .Param "math" -}}
+{{- $mathPattern := `(?m)(\$\$|\\\(|\\\[|\$[^$\r\n]+\$)` -}}
+{{- $hasMath := or (.Param "math") (gt (len (findRE $mathPattern .RawContent 1)) 0) -}}
+{{- if $hasMath -}}
 <script>
   window.MathJax = {
     tex: {
       displayMath: [['\\[', '\\]'], ['$$', '$$']],
-      inlineMath: [['\\(', '\\)']],
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
       processEscapes: true
     },
     loader: { load: ['ui/safe'] },

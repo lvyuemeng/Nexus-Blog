@@ -39,7 +39,10 @@ cross-bundle traversal are not portable note resources.
 
 ## Math
 
-Declare math on pages that need it:
+Nexus detects standard math delimiters and loads MathJax only on pages that use
+them. No front matter is required for ordinary Markdown equations. For generated
+or shortcode-provided equations that are absent from the Markdown source, opt in
+explicitly:
 
 ```yaml
 ---
@@ -49,8 +52,8 @@ math: true
 ---
 ```
 
-Supported delimiters are `\(...\)` for inline math and `\[...\]` or `$$...$$`
-for display math.
+Supported delimiters are `$...$` or `\(...\)` for inline math and `\[...\]` or
+`$$...$$` for display math.
 
 ## PDF posts
 

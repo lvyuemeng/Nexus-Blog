@@ -34,6 +34,16 @@ func TestValidContentContract(t *testing.T) {
 	if strings.Contains(markdown, "typeset: false") {
 		t.Error("MathJax disables initial typesetting")
 	}
+	if !strings.Contains(markdown, `$p = mv$`) {
+		t.Error("Markdown output does not preserve single-dollar math for MathJax")
+	}
+	styles := readGeneratedStyles(t, outputDir)
+	normalizedStyles := strings.ToLower(styles)
+	for _, expected := range []string{"Cascadia Code", "ui-monospace"} {
+		if !strings.Contains(normalizedStyles, strings.ToLower(expected)) {
+			t.Errorf("generated styles missing code font %q", expected)
+		}
+	}
 	plainPage := readOutput(t, outputDir, "posts", "target", "index.html")
 	if strings.Contains(plainPage, "MathJax-script") {
 		t.Error("page without math opt-in loads MathJax")
@@ -235,4 +245,27 @@ func assertOutputExists(t *testing.T, outputDir string, elements ...string) {
 	if _, err := os.Stat(path); err != nil {
 		t.Errorf("expected generated resource %s: %v", path, err)
 	}
+}
+
+func readGeneratedStyles(t *testing.T, outputDir string) string {
+	t.Helper()
+	var styles strings.Builder
+	cssRoot := filepath.Join(outputDir, "assets", "css")
+	err := filepath.Walk(cssRoot, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(path) == ".css" {
+			content, readErr := os.ReadFile(path)
+			if readErr != nil {
+				return readErr
+			}
+			styles.Write(content)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("read generated styles: %v", err)
+	}
+	return styles.String()
 }

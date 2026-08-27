@@ -2,10 +2,11 @@
 title: "Markdown contract"
 date: 2026-08-27
 draft: false
-math: true
 ---
 
 Inline math uses \(E = mc^2\).
+
+Single-dollar inline math uses $p = mv$.
 
 \[
 \int_0^1 x^2\,dx = \frac{1}{3}
